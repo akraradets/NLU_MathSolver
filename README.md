@@ -2,8 +2,8 @@
 
 Team member
 ===========
-st120224 Akraradet Sinsamersuk
-st120534 Ruangtiwa Kimsungnoen
+- st120224 Akraradet Sinsamersuk
+- st120534 Ruangtiwa Kimsungnoen
 
 Trello Board
 ============
