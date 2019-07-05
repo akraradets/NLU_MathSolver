@@ -1,5 +1,7 @@
 # NLU_MathSolver
-[Trello Board](https://trello.com/b/J8uiIosP/mathsolver)
+- [Trello Board](https://trello.com/b/J8uiIosP/mathsolver)
+- [Getting start with NLTK](https://www.nltk.org/book/ch01.html)
+
 
 Team member
 ===========
