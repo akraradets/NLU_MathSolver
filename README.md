@@ -7,3 +7,4 @@ Team member
 ===========
 - st120224 Akraradet Sinsamersuk
 - st120534 Ruangtiwa Kimsungnoen
+- st120593 Part Jaithong
