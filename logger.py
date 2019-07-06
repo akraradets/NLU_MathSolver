@@ -8,13 +8,12 @@ import logging
 
 class Logger:
     def __init__(self, className):
-        logging.basicConfig(format='%(asctime)s - %(message)s', filename='log.txt',
+        logging.basicConfig(format='%(asctime)s-%(levelname)s-%(message)s', filename='log.txt',
                             datefmt='%Y%m%d %H:%M:%S', level=logging.DEBUG)
         logging.getLogger().addHandler(logging.StreamHandler())
         self.className = className
 
     def log(self, level, message):
-
         if level not in ["debug", "info", "warning", "error", "critical"]:
             raise Exception(
                 "Logger level on accept [debug,info,warning,error,critical].")
