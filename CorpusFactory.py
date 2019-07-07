@@ -1,7 +1,7 @@
 from nltk import corpus
 from logger import Logger
 
-class myCorpus:
+class CorpusFactory:
     def __init__(self):
         self.className = "myCorpus"
         self.logger = Logger(self.className)
@@ -11,7 +11,7 @@ class myCorpus:
     def getData(self):
         print("{0}+{1}j".format(self.real, self.imag))
 
-c = myCorpus()
+c = CorpusFactory()
 # Gutenberg
 # nltk.corpus.gutenberg.fileids()
 # ['austen-emma.txt', 'austen-persuasion.txt', 

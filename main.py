@@ -1,4 +1,5 @@
 from LoggerFactory import LoggerFactory
+from CorpusFactory import CorpusFactory
 from nltk import word_tokenize
 from nltk import pos_tag
 class Main:
