@@ -1,5 +1,5 @@
 from LoggerFactory import LoggerFactory
-from nltk import corpus
+from nltk import corpus, NgramTagger
 from nltk import FreqDist, ConditionalFreqDist, UnigramTagger ,BigramTagger
 
 class CorpusFactory:
@@ -10,6 +10,7 @@ class CorpusFactory:
         self.logger.info(f'Load Corpus - Brown - {cat}')
         words = self.corpus.words(categories=cat)
         tagged_words = self.corpus.tagged_words(categories=cat)
+
         tagged_sents = self.corpus.tagged_sents(categories=cat)
         fd = FreqDist(words)
         cfd = ConditionalFreqDist(self.tagged_words)
@@ -18,6 +19,7 @@ class CorpusFactory:
         self.unigram = UnigramTagger(model=likely_tags)
         train_len = int(len(tagged_sents)*0.9)
         self.bigram = BigramTagger(tagged_sents[:train_len], backoff=self.unigram)
+        self.bigram.evaluate(tagged_sents[:train_len])
 
 c = CorpusFactory()
 # most_freq_words = fd.most_common(1000000)
