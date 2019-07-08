@@ -1,20 +1,19 @@
 from LoggerFactory import LoggerFactory
 from CorpusFactory import CorpusFactory
 from nltk import word_tokenize
+from nltk.lm.preprocessing import pad_both_ends
 from nltk import pos_tag
 class Main:
     def __init__(self):
-        self.className = "Main"
-        self.logger = LoggerFactory(self.className).getLogger()
+        self.logger = LoggerFactory(self).getLogger()
 
-    def run(self, example=False):
+    def run(self, nGram=2 , example=False):
         self.logger.debug('Starting...')
         sents = self.getInput(example)
         # ['I am batman', 'You are superman']
-        sents = self.tokenize(sents)
+        sents = self.tokenize(sents,nGram)
         # [['I', 'am', 'batman'], ['You', 'are', 'superman']]
         tagged = self.posTag(sents)
-        print(tagged)
 
     def getInput(self,example):
         if example == True:
@@ -31,10 +30,14 @@ class Main:
         self.logger.info(f'Input=>{sentences}')
         return sentences
 
-    def tokenize(self, sentences):
+    def tokenize(self, sentences, nGram=2):
         # ['I am batman', 'You are superman']
         for index in range(len(sentences)):
-            sentences[index] = word_tokenize(sentences[index])
+            sent = sentences[index]
+            tokenized = word_tokenize(sent)
+            padded = list(pad_both_ends(tokenized,n=nGram))
+            sentences[index] = padded
+            
         self.logger.debug(f'Tokenize=>{sentences}')
         return sentences
 
@@ -46,5 +49,5 @@ class Main:
         return tagged
 
 main = Main()
-main.run(example=True)
+main.run(example=True,nGram=2)
 # main.run()

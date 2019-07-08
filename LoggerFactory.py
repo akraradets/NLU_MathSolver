@@ -7,12 +7,12 @@ import logging
 
 
 class LoggerFactory:
-    def __init__(self, className):
+    def __init__(self, callerClass):
         format = '%(asctime)s-%(name)s(%(funcName)s)-%(levelname)s|%(message)s'
         file = 'log.txt'
         dateFormat = '%Y%m%d %H:%M:%S'
         logging.basicConfig(format=format, filename=file, datefmt=dateFormat)
-        self.logger = logging.getLogger(className)
+        self.logger = logging.getLogger(callerClass.__class__.__name__)
         self.logger.setLevel(logging.DEBUG)
         
         formatter = logging.Formatter(fmt=format)
