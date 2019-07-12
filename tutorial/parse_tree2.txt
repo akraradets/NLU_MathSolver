@@ -1,0 +1,25 @@
+(ROOT
+  (S
+    (NP
+      (PRP
+        I))
+    (VP
+      (VBP
+        get)
+      (NP
+        (NP
+          (DT a)
+          (NP
+            (NN
+              bachelor)
+            (POS 's)
+            (NN
+              degree)))
+        (PP
+          (IN in)
+          (NP
+            (NP
+              (NN
+                computer)
+              (NN
+                engineering))))))))
