@@ -1,9 +1,11 @@
 import time
 import os.path
 from subprocess import Popen, PIPE, STDOUT, check_output
+from LoggerFactory import LoggerFactory
 
 class ParserDepen:
     def __init__(self):
+        self.logger = LoggerFactory(self).getLogger()
         self.path = "libs/stanford-parser/"
         self.file = "stanford-parser.jar"
     
@@ -24,12 +26,12 @@ class ParserDepen:
         if(len(list_of_dependency_relations) > 0):
             del(list_of_dependency_relations[idx-1])
 
-        print()
-        for relation in list_of_dependency_relations:
-            print(relation)
+        self.logger.info(f'DependencyTree={list_of_dependency_relations}')
+        self.logger.debug(f'ProcessingTime={(time.time() - now)}')
+        # print()
+        # for relation in list_of_dependency_relations:
+        #     print(relation)
 
-        print("\nDependency Parsing Time Elased (Per one constituency tree): ",
-            (time.time() - now), "seconds.\n")
 
 # p = ParserDepen()
 # p.parse("tutorial/parse_tree2.txt")
