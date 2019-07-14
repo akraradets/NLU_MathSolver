@@ -1,6 +1,6 @@
-FILE="stanford-parser-full-2018-10-17.zip"
-DIR="stanford-parser-full-2018-10-17"
-LINK="stanford-parser"
+FILE="stanford-corenlp-full-2018-10-05.zip"
+DIR="stanford-corenlp-full-2018-10-05"
+LINK="stanford-corenlp"
 
 if [ -d "./libs" ] 
 then
