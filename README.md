@@ -4,7 +4,8 @@
 - [POSTag](https://www.cs.bgu.ac.il/~elhadad/nlp17/NLTKPOSTagging.html)
 - [Dependency Tree](http://www.nltk.org/howto/dependency.html)
 - [Standford Dependency tree](https://stackoverflow.com/questions/7443330/how-do-i-do-dependency-parsing-in-nltk)
-- [Standford Core NLP](https://corenlp.run/)
+- [Standford Core NLP](https://github.com/nltk/nltk/wiki/Stanford-CoreNLP-API-in-NLTK)
+- [Standford Core NLP - RUN](https://corenlp.run/)
 
 Team member
 ===========
