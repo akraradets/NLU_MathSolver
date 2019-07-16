@@ -3,7 +3,7 @@ from LoggerFactory import LoggerFactory
 class Entity:
     def __init__(self,sent_obj,node):
         # we name the entity after its main lemma node
-        self.name = node['lemma']
+        self.name = node['lemma'].lower()
         self.attr = set()
         for a in node['deps']['amod']:
             lem = sent_obj.get_by_address(a)['lemma']

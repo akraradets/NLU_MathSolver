@@ -32,16 +32,6 @@ class Main:
         self.processEntity(obj=obj, target=actor_node)
         self.processEntity(obj=obj, target=actee_node)
         self.kb.dump()
-        # print("END")
-        # Actor
-        # entity = self.kb.get(actor['lemma'])
-        # entity.setup(actor)
-        # self.kb.set(index=actor['lemma'],entity=entity)
-        # # Actee
-        # entity = self.kb.get(actee['lemma'])
-        # entity.setup(actee)
-        # self.kb.set(index=actee['lemma'], entity=entity)
-        # # Action
 
     def processEntity(self,obj,target):
         # create entity from the given information
@@ -49,12 +39,11 @@ class Main:
         # Now, we set this entity into the KnowledgeBase
         self.kb.set(entity)
 
-
     def getInput(self, example):
         if example == True:
-            sentences = ['The tall fat man has 20 good apples.'
+            sentences = ['The tall fat man has 20 good apples',
                 # 'Mane gives 5 of them to Surat.', 
-                # 'How many apples does Mane has?'
+                # 'How many apples does tall Mane has?'
                 ]
             self.logger.info(f'Input-Example=>{sentences}')
             return sentences
