@@ -31,24 +31,44 @@ class Main:
         # KB management
         actor = self.processEntity(obj=obj, target=actor_node)
         actee = self.processEntity(obj=obj, target=actee_node)
-        action = self.processAction(obj=obj, action=action_node)
+        self.processAction(obj=obj, 
+                           actorEntity=actor,
+                           action=action_node,
+                           actee=actee_node)
         self.kb.dump()
 
     def processEntity(self,obj,target):
         # create entity from the given information
         entity = Entity(sent_obj=obj,node=target)
         # Now, we set this entity into the KnowledgeBase
-        self.kb.set(entity)
+        entity = self.kb.set(entity)
+        return entity
 
-    def processAction(self,obj,action):
+    def processAction(self,obj,actorEntity,action,actee):
+        own = {'have'}
+        add = {'get'}
+        sub = {}
+        quantity = 'some'
+        # Extract Quantity from the sentence
+        if('nummod' in actee['deps']):
+            CD = obj.get_by_address(actee['deps']['nummod'][0])
+            quantity = int(CD['lemma'])
+
+        # create property to actor
+        if(action['lemma'] in own):
+            actorEntity.setProperty(actee['lemma'], quantity)
+        # add more of the property t the actor
+        elif(action['lemma'] in add):
+            number = actorEntity.getProperty(actee['lemma'])['quantity']
+            number = number + quantity
+            actorEntity.setProperty(actee['lemma'], number)
+            pass
         
-        pass
-
     def getInput(self, example):
         if example == True:
-            sentences = ['The tall fat man has 20 good apples'
-                # 'the old man gives 5 of them to Surat.', 
-                # 'How many apples does tall Mane has?'
+            sentences = ["The dog has 7 bones.", 
+            "Dog gets 3 more bones.", 
+            # "How many bones altogether?"
                 ]
             self.logger.info(f'Input-Example=>{sentences}')
             return sentences
