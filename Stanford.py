@@ -35,7 +35,7 @@ class Main:
 
         # Is this a question?
         if(obj.get_by_address(1)['tag'] == 'WRB'):
-            self.processQuestion()
+            self.processQuestion(obj,actor,action_node,actee_node)
         else:
             self.processAction(obj=obj, 
                             actorEntity=actor,
@@ -50,10 +50,35 @@ class Main:
         entity = self.kb.set(entity)
         return entity
 
+    def processQuestion(self, obj, actorEntity, action, actee):
+        own = {'have'}
+        quantity = ''
+        answer = ''
+        # create property to actor
+        if(action['lemma'] in own):
+            number = actorEntity.getProperty(actee['lemma'])['quantity']
+            subj = self.construct(obj, 'nsubj')
+            dobj = self.construct(obj, 'dobj')
+            if(number > 1):
+                dobj = dobj+'s'
+            print(f'ANSWER=>"{subj} {action["word"]} {number} {dobj}"')
+
+    def construct(self, obj, target):
+        ret = ''
+        main = obj.get_by_address(obj.root['deps'][target][0])
+        if('det' in main['deps']):
+            ret = ret + obj.get_by_address(main['deps']['det'][0])['lemma'] + " "
+        if('amod' in main['deps']):
+            for amod in main['deps']['amod']:
+                if(obj.get_by_address(amod)['lemma'] != "many"):
+                    ret = ret + obj.get_by_address(amod)['lemma'] + " "
+        ret = ret + main['lemma']
+        return ret                
+
     def processAction(self,obj,actorEntity,action,actee):
         own = {'have'}
-        add = {'get'}
-        sub = {}
+        add = {'get', 'buy'}
+        sub = {'give'}
         quantity = 'some'
         # Extract Quantity from the sentence
         if('nummod' in actee['deps']):
@@ -68,14 +93,17 @@ class Main:
             number = actorEntity.getProperty(actee['lemma'])['quantity']
             number = number + quantity
             actorEntity.setProperty(actee['lemma'], number)
-            pass
-        
+        elif(action['lemma'] in sub):
+            number = actorEntity.getProperty(actee['lemma'])['quantity']
+            number = number - quantity
+            actorEntity.setProperty(actee['lemma'], number)           
+
     def getInput(self, example):
         if example == True:
-            sentences = ["The dog has 7 bones.", 
-            "Dog gets 3 more bones.", 
-            # "How many bones altogether?"
-            "How many bones does the dog have?"
+            sentences = ["The old man has 10 red balls.", 
+                         "The man gives 3 balls away.",
+                        # "How many bones altogether?"
+                        "How many balls does the tall man have?"
                 ]
             self.logger.info(f'Input-Example=>{sentences}')
             return sentences
