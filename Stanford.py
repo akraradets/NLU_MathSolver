@@ -24,6 +24,7 @@ class Main:
         for p in parsed:
             obj = p
         self.logger.debug(obj)
+
         # root is always the main action
         action_node = obj.root
         actor_node = obj.get_by_address(obj.root['deps']['nsubj'][0])
@@ -31,10 +32,15 @@ class Main:
         # KB management
         actor = self.processEntity(obj=obj, target=actor_node)
         actee = self.processEntity(obj=obj, target=actee_node)
-        self.processAction(obj=obj, 
-                           actorEntity=actor,
-                           action=action_node,
-                           actee=actee_node)
+
+        # Is this a question?
+        if(obj.get_by_address(1)['tag'] == 'WRB'):
+            self.processQuestion()
+        else:
+            self.processAction(obj=obj, 
+                            actorEntity=actor,
+                            action=action_node,
+                            actee=actee_node)
         self.kb.dump()
 
     def processEntity(self,obj,target):
@@ -69,6 +75,7 @@ class Main:
             sentences = ["The dog has 7 bones.", 
             "Dog gets 3 more bones.", 
             # "How many bones altogether?"
+            "How many bones does the dog have?"
                 ]
             self.logger.info(f'Input-Example=>{sentences}')
             return sentences
