@@ -19,18 +19,19 @@ class KnowledgeBase:
         # update the node with entity
         node.updateAttr(entity)
         # save new entity to the memory with the index
-        self.memory[entity.name] = node
+        self.memory[node.name] = node
         return node
 
     def find(self,entity):
         candidates = []
         for index, node in self.memory.items():
-            if(node.name == entity.name):
+            if(node.name == entity.name or node.alias == entity.name):
                 candidates.append(node)
         # print(candidates)
         # this is new entity
         if(len(candidates) == 0):
             self.logger.debug(f'0 [{entity.name}] found')
+            # find_by_alias
             return entity
         # this one candidate is the entity
         elif(len(candidates) == 1):

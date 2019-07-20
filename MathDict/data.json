@@ -32,6 +32,18 @@
         "Answer": 11.0
     },
     {
+        "Question": "Sue eats 5 ear of corn. She eats 7 more ears. How many ears does Sue eat",
+        "Answer": 12.0
+    },
+    {
+        "Question": "Sue eats 2 ear of corn. She eats 7 more ears. How many ears does she eat",
+        "Answer": 9.0
+    },
+    {
+        "Question": "Sue eats 3 ear of corn. She eats 1 more. How many does she eat",
+        "Answer": 4.0
+    },
+    {
         "Question": "Sue eats 1 ear of corn. Her dad eats 2 ears of corn. How many do they eat altogether?",
         "Answer": 3.0
     },

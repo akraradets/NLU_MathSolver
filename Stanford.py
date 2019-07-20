@@ -38,7 +38,7 @@ class Main:
             # Target is for which dataset number you want to test with
             if(target >= 0):
                 dataset = [dataset[target]]
-            start = 8
+            start = 10
             for i in range(start, end):
             # for data in dataset:
                 data = dataset[i]
@@ -46,10 +46,12 @@ class Main:
                 answer = data['Answer']
                 # before we process each set, we reset the KnowledgeBase
                 self.kb.reset()
+                self.lastEntity = {}
                 # process the sentences nomally
                 for sent in sentences:
                     self.processSent(sent)
-                print(i, answer, self.dataset_answer)
+                print(f'[{i}] {data["Question"]}')
+                print(f'DatasetAnswer={answer}|BotAnswer={self.dataset_answer}')
                 input("++++++++++++++++++++++++++++++++++++++++++++++++++++++")
                 
 
@@ -89,8 +91,17 @@ class Main:
                             action=action_node,
                             actee=actee_node)
 
-        self.lastEntity['actor'] = {'count': 0, 'entity': actor}
-        self.lastEntity['actee'] = {'count': 0, 'entity': actee}
+        # Never set lastEntity
+        if(len(self.lastEntity) == 0):
+            self.lastEntity['actor'] = {'count': 0, 'entity': actor}
+            self.lastEntity['actee'] = {'count': 0, 'entity': actee}
+        else:
+            # never use this to refer => reset
+            if(self.lastEntity['actor']['count'] == 0):
+                self.lastEntity['actor'] = {'count': 0, 'entity': actor}
+            if(self.lastEntity['actee']['count'] == 0):
+                self.lastEntity['actee'] = {'count': 0, 'entity': actee}
+
         print("-------- KnowledgeBase --------")
         self.kb.dump()
         print("======== KnowledgeBase ========")
@@ -144,7 +155,7 @@ class Main:
                     
 
                 for index, node in self.kb.memory.items():
-                    number = node.getProperty(property)['quantity']
+                    number = node.getProperty(property,self.kb)['quantity']
                     if(number == None): continue
                     if(comparator in gt and number >= gt_temp):
                         entity = node
@@ -160,7 +171,7 @@ class Main:
             quantity = ''
             # create property to actor
             if(action['lemma'] in own):
-                number = actorEntity.getProperty(actee['lemma'])['quantity']
+                number = actorEntity.getProperty(actee['lemma'],self.kb)['quantity']
                 subj = self.construct(obj, 'nsubj')
                 if(number > 1):
                     dobj = self.construct(obj, 'dobj', True)
@@ -196,12 +207,9 @@ class Main:
         quantity = 'some'
         verb = action['lemma']
         # Extract Quantity from the sentence
-        # 3 [actee]
-        if('nummod' in actee['deps']):
-            CD = obj.get_by_address(actee['deps']['nummod'][0])
-            quantity = int(CD['lemma'])
         # 3 [head] of [actee]
-        elif(actee['rel'] == 'nmod'):
+        if(actee['rel'] == 'nmod'):
+            self.logger.debug("[Search for head]")
             head = obj.get_by_address(actee['head'])
             CD = obj.get_by_address(head['deps']['nummod'][0])
             quantity = int(CD['lemma'])
@@ -214,18 +222,36 @@ class Main:
                         verb = '[more]'
                     if(amod['lemma'] == 'less'):
                         verb = '[less]'
+        else:
+            # 3 [actee]
+            self.logger.debug("[This is head]")
+            if('nummod' in actee['deps']):
+                CD = obj.get_by_address(actee['deps']['nummod'][0])
+                quantity = int(CD['lemma'])
+            # 3 [more|less] ears
+            if('amod' in actee['deps']):
+                for amod_index in actee['deps']['amod']:
+                    amod = obj.get_by_address(amod_index)
+                    if(amod['lemma'] == 'more'):
+                        verb = '[more]'
+                    if(amod['lemma'] == 'less'):
+                        verb = '[less]'
+
         # create property to actor
         if(verb in own):
+            self.logger.debug("[OWN]")
             actorEntity.setProperty(actee['lemma'], quantity)
         # add more of the property t the actor
         elif(verb in add):
-            number = actorEntity.getProperty(actee['lemma'])['quantity']
-            number = number + quantity
-            actorEntity.setProperty(actee['lemma'], number)
+            self.logger.debug("[ADD]")
+            item = actorEntity.getProperty(actee['lemma'],self.kb)
+            number = item['quantity'] + quantity
+            actorEntity.setProperty(item['name'], number)
         elif(verb in sub):
-            number = actorEntity.getProperty(actee['lemma'])['quantity']
-            number = number - quantity
-            actorEntity.setProperty(actee['lemma'], number)           
+            self.logger.debug("[SUB]")
+            item = actorEntity.getProperty(actee['lemma'], self.kb)
+            number = item['quantity'] - quantity
+            actorEntity.setProperty(item['name'], number)
 
     def getInput(self):
         print("Enter Text. When you are done, type Q")
