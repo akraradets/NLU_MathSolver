@@ -62,6 +62,9 @@ class Main:
         action_node = obj.root
         actor_node = obj.get_by_address(obj.root['deps']['nsubj'][0])
         actee_node = obj.get_by_address(obj.root['deps']['dobj'][0])
+        # [actee] of [real object]
+        if('nmod' in actee_node['deps']):
+            actee_node = obj.get_by_address(actee_node['deps']['nmod'][0])
         # KB management
         actor = self.processEntity(obj=obj, target=actor_node)
         actee = self.processEntity(obj=obj, target=actee_node)
@@ -144,24 +147,39 @@ class Main:
         return ret                
 
     def processAction(self,obj,actorEntity,action,actee):
-        own = {'have'}
-        add = {'get', 'buy'}
-        sub = {'give'}
+        own = {'have', 'eat', 'buy'}
+        add = {'[more]', 'get'}
+        sub = {'[less]', 'give'}
         quantity = 'some'
+        verb = action['lemma']
         # Extract Quantity from the sentence
+        # 3 [actee]
         if('nummod' in actee['deps']):
             CD = obj.get_by_address(actee['deps']['nummod'][0])
             quantity = int(CD['lemma'])
-
+        # 3 [head] of [actee]
+        elif(actee['rel'] == 'nmod'):
+            head = obj.get_by_address(actee['head'])
+            CD = obj.get_by_address(head['deps']['nummod'][0])
+            quantity = int(CD['lemma'])
+            # [black] ears of corn
+            # 3 [more] [black] ears of corn
+            if('amod' in head['deps']):
+                for amod_index in head['deps']['amod']:
+                    amod = obj.get_by_address(amod_index)
+                    if(amod['lemma'] == 'more'):
+                        verb = '[more]'
+                    if(amod['lemma'] == 'less'):
+                        verb = '[less]'
         # create property to actor
-        if(action['lemma'] in own):
+        if(verb in own):
             actorEntity.setProperty(actee['lemma'], quantity)
         # add more of the property t the actor
-        elif(action['lemma'] in add):
+        elif(verb in add):
             number = actorEntity.getProperty(actee['lemma'])['quantity']
             number = number + quantity
             actorEntity.setProperty(actee['lemma'], number)
-        elif(action['lemma'] in sub):
+        elif(verb in sub):
             number = actorEntity.getProperty(actee['lemma'])['quantity']
             number = number - quantity
             actorEntity.setProperty(actee['lemma'], number)           
@@ -191,4 +209,4 @@ main = Main()
 # mode 9 = example
 # main.run(mode=9)
 # mode 10 = dataset 
-main.run(mode=10,target=-1)
+main.run(mode=10,target=2)
