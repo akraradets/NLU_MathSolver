@@ -218,5 +218,50 @@
     {
         "Question": "3 friends are playing. 2 more friends join them. How many friends play?",
         "Answer": 5.0
+    },
+    {
+        "Question": "Paul had 15 balls. He met a friend and gave him 12 of them. How many balls does he have now?",
+        "Answer": 3.0
+    },
+    {
+        "Question": "Steve had 7 marbles. A friend gave him 3 more. How many marbles does he have now?",
+        "Answer": 10.0
+    },
+    {
+        "Question": "John had 17 pencils. He lost 4 of them. How many all pencils does he have now?",
+        "Answer": 13.0
+    },
+    {
+        "Question": "Steve had 19 small cars. He bought 16 big cars more. How many small cars does he have now?",
+        "Answer": 19.0
+    },
+    {
+        "Question": "Ned rode his bike 7 miles to the library.He took a shortcut on the way home which was only 5 miles long.How many miles did Ned ride altogether?",
+        "Answer": 12.0
+    },
+    {
+        "Question": "Anne ate 6 cookies.Samantha ate 4 more cookies than Anne.How many cookies did Samantha eat?",
+        "Answer": 10.0
+    },
+    {
+        "Question": "Henry gave 5 stickers to his younger brother.Now he only has 9 stickers.How many stickers did Heny have at first?",
+        "Answer": 14.0
+    },
+    {
+        "Question": "Derek and Larry have 15 books together.6 of the books belong to Derek.How many books does Larry have?",
+        "Answer": 9.0
+    },
+    {
+        "Question": "Angela had 8 computer games.She got 3 more for her birthday.How many computer games did Angela have then?",
+        "Answer": 11.0
+    },
+    {
+        "Question": "15 children watched the circus.8 children were holding banners.How many children were not holding banners?",
+        "Answer": 7.0
+    },
+    {
+        "Question": "A clown juggled 7 red balls.Another clown tossed him 5 more balls.How many balls was the clown juggling then?",
+        "Answer": 12.0
     }
+
 ]
