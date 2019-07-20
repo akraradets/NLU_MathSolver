@@ -262,6 +262,43 @@
     {
         "Question": "A clown juggled 7 red balls.Another clown tossed him 5 more balls.How many balls was the clown juggling then?",
         "Answer": 12.0
+    },
+    {
+        "Question": "There are 11 clowns on the stage. 5 clowns were wearing striped pants. The rest were wearing polka dot pants. How many more clowns were wearing polka dot pants?",
+        "Answer": 6.0
+    },
+    {
+        "Question": "14 elephants entered the ring for the first show.After the show, 6 elephants left.How many elephants were still in the ring?",
+        "Answer": 8.0
+    },
+    {
+        "Question": "7 children jumped up and cheered for the clowns. 5 more children joined them. How many children were cheering then?",
+        "Answer": 12.0
+    },
+    {
+        "Question": "Marcus had 15 candy bars. He gave 5 to his friend, Jack. He ate 3 of them after dinner. How many candy bars did Marcus have then?",
+        "Answer": 7.0
+    },
+    {
+        "Question": "7 children were waiting in line to see the magic show. 8 more children came. 5 children left to buy popcorn. How many children were standing in line then?",
+        "Answer": 10.0
+    },
+    {
+        "Question": "Sarah had 18 cents. She bought a lollipop for 5 cents and gum for 8 cents. How much money did Sarah have then?",
+        "Answer": 5.0
+    },
+    {
+        "Question": "Today is Jaclyn's birthday. She got 5 cards from friends at school. 3 cards came in the mail. She got 8 more cards from her family. How many cards did Jaclyn get for her birthday?",
+        "Answer": 16.0
+    },
+    {
+        "Question": "Kyle built 9 towers with his blocks. His younger brother knocked down 2 of them by accident. Kyle's friend came over and together they built 4 more towers. How many towers did Kyle have then?",
+        "Answer": 11.0
+    },
+    {
+        "Question": "My sister and I made snow balls after the big storm. I made 25 snowballs. My sister made 13 more snowballs than me. How many snowballs did my sister make?",
+        "Answer": 38.0
     }
+
 
 ]
