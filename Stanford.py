@@ -9,11 +9,25 @@ class Main:
         self.parser = CoreNLPDependencyParser(url='http://localhost:9000')
         self.kb = KnowledgeBase()
 
-    def run(self, example=False):
+    def run(self, mode=9):
         self.logger.debug('Starting...')
-        sents = self.getInput(example)
+        sentences = []
+        if(mode == 0):
+            # normal input mode
+            sentences = self.getInput()
+        if(mode == 9):
+            # example mode
+            sentences = ["The old man has 10 red balls.", 
+                         "The man gives 3 balls away.",
+                        # "How many bones altogether?"
+                        "How many balls does the tall man have?"
+                ]
+            self.logger.info(f'Input-Example=>{sentences}')
+        if(mode == 10):
+            # run dataset
+            pass
 
-        for sent in sents:
+        for sent in sentences:
             self.processSent(sent)
 
     def processSent(self,sent):
@@ -98,15 +112,7 @@ class Main:
             number = number - quantity
             actorEntity.setProperty(actee['lemma'], number)           
 
-    def getInput(self, example):
-        if example == True:
-            sentences = ["The old man has 10 red balls.", 
-                         "The man gives 3 balls away.",
-                        # "How many bones altogether?"
-                        "How many balls does the tall man have?"
-                ]
-            self.logger.info(f'Input-Example=>{sentences}')
-            return sentences
+    def getInput(self):
         print("Enter Text. When you are done, type Q")
         sentences = []
         while True:
@@ -119,4 +125,7 @@ class Main:
 
 
 main = Main()
-main.run(example=True)
+# mode 0 = normal
+# mode 9 = example
+# mode 10 = dataset 
+main.run(mode=9)
