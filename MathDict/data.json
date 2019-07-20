@@ -1,5 +1,17 @@
 [
     {
+        "Question": "Pete has 9 books. Ellen has 14 books. Who has more book?",
+        "Answer": "Ellen"
+    },
+    {
+        "Question": "Pete has 9 books. Ellen has 14 books. Who has the greater number of books?",
+        "Answer": "Ellen"
+    },
+    {
+        "Question": "Pete has 9 books. Ellen has 14 books. Who has less book?",
+        "Answer": "Pete"
+    },
+    {
         "Question": "Pete has 9 books. Ellen has 14 books. Who has the least number of books?",
         "Answer": "Pete"
     },

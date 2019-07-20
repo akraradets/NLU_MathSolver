@@ -9,7 +9,7 @@ class Main:
         self.parser = CoreNLPDependencyParser(url='http://localhost:9000')
         self.kb = KnowledgeBase()
 
-    def run(self, mode=9, target=-1):
+    def run(self, mode=9, target=-1, start=0, end=10000):
         self.logger.debug('Starting...')
 
         sentences = []
@@ -37,7 +37,10 @@ class Main:
             # Target is for which dataset number you want to test with
             if(target >= 0):
                 dataset = [dataset[target]]
-            for data in dataset:
+            start = 7
+            for i in range(start, end):
+            # for data in dataset:
+                data = dataset[i]
                 sentences = sent_tokenize(data['Question'])
                 answer = data['Answer']
                 # before we process each set, we reset the KnowledgeBase
@@ -45,7 +48,7 @@ class Main:
                 # process the sentences nomally
                 for sent in sentences:
                     self.processSent(sent)
-                print(answer, self.dataset_answer)
+                print(i, answer, self.dataset_answer)
                 input("======================================")
                 
 
@@ -90,7 +93,7 @@ class Main:
         return entity
 
     def processQuestion(self, obj, actorEntity, action, actee):
-        own = {'have'}
+        own = {'have', 'eat', 'buy'}
         answer = ''
         # There are many type of question
         tag = obj.get_by_address(1)['tag']
@@ -100,15 +103,28 @@ class Main:
             if(action['lemma'] in own):
                 import math
                 # someone owns actee
-                gt = {'greater'}
-                lt = {'least'}
+                gt = {'[more]','greater'}
+                lt = {'[less]', 'least'}
                 gt_temp = -math.inf
                 lt_temp = math.inf
                 entity = None
-                if(actee['lemma'] == 'number'):
-                    comparator = obj.get_by_address(actee['deps']['amod'][0])['lemma']
-                    property = obj.get_by_address(actee['deps']['nmod'][0])['lemma']
-                self.logger.info(f'Who has {comparator} {actee["lemma"]} of {property}')
+                property = actee['lemma']
+                # number of [actee]
+                if('case' in actee['deps']):
+                    head = obj.get_by_address(actee['head'])
+                    comparator = obj.get_by_address(head['deps']['amod'][0])['lemma']
+                    # self.logger.info(f'Who has {comparator} {actee["lemma"]} of {property}')
+                # [more|less] [actee]
+                else:
+                    if('amod' in actee['deps']):
+                        for amod_index in actee['deps']['amod']:
+                            amod = obj.get_by_address(amod_index)
+                            if(amod['lemma'] == 'more'):
+                                comparator = '[more]'
+                            if(amod['lemma'] == 'less'):
+                                comparator = '[less]'
+                    
+
                 for index, node in self.kb.memory.items():
                     number = node.getProperty(property)['quantity']
                     if(number == None): continue
@@ -128,22 +144,31 @@ class Main:
             if(action['lemma'] in own):
                 number = actorEntity.getProperty(actee['lemma'])['quantity']
                 subj = self.construct(obj, 'nsubj')
-                dobj = self.construct(obj, 'dobj')
                 if(number > 1):
-                    dobj = dobj+'s'
+                    dobj = self.construct(obj, 'dobj', True)
+                else:
+                    dobj = self.construct(obj, 'dobj')
                 self.dataset_answer = number
                 print(f'ANSWER=>"{subj} {action["word"]} {number} {dobj}"')
 
-    def construct(self, obj, target):
+    def construct(self, obj, target, plural = False):
         ret = ''
         main = obj.get_by_address(obj.root['deps'][target][0])
         if('det' in main['deps']):
             ret = ret + obj.get_by_address(main['deps']['det'][0])['lemma'] + " "
+
         if('amod' in main['deps']):
             for amod in main['deps']['amod']:
                 if(obj.get_by_address(amod)['lemma'] != "many"):
                     ret = ret + obj.get_by_address(amod)['lemma'] + " "
+        
         ret = ret + main['lemma']
+
+        if(plural):
+            ret = ret + 's'
+
+        if('nmod' in main['deps']):
+            ret = ret + " of " + obj.get_by_address(main['deps']['nmod'][0])['lemma']
         return ret                
 
     def processAction(self,obj,actorEntity,action,actee):
@@ -209,4 +234,4 @@ main = Main()
 # mode 9 = example
 # main.run(mode=9)
 # mode 10 = dataset 
-main.run(mode=10,target=2)
+main.run(mode=10,start=0)
