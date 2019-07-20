@@ -393,5 +393,50 @@
         "No.": 79,
         "Question": "My sister and I made snow balls after the big storm. I made 25 snowballs. My sister made 13 more snowballs than me. How many snowballs did my sister make?",
         "Answer": 38.0
+    },
+    {
+        "No.": 80,
+        "Question": "Sam had 17 stamps. He found 8 more. How many stamps does he have now ?",
+        "Answer": 25.0
+    },
+    {
+        "No.": 81,
+        "Question": "There were 16 children on the school bus. 8 children got off at the first stop. How many children were on the bus then?",
+        "Answer": 8.0
+    },
+    {
+        "No.": 82,
+        "Question": "Chad bought presents for his mom and dad. His mom's present cost 7 dollars. His dad's present cost 8 dollars. How much money did Chad spend?",
+        "Answer": 15.0
+    },
+    {
+        "No.": 83,
+        "Question": "Sarah has 14 dimes. Joe has 7 dimes. How many more dimes does Sarah have than Joe?",
+        "Answer": 7.0
+    },
+    {
+        "No.": 84,
+        "Question": "Anthony is saving his money for a new toy. He saved 5 dollars last month and 6 dollars this month. How much money has Anthony saved so far?",
+        "Answer": 11.0
+    },
+    {
+        "No.": 85,
+        "Question": "Lucy rode the merry-go-round 7 times yesterday and 8 times today. How many times did she ride the merry-go-round altogether?",
+        "Answer": 15.0
+    },
+    {
+        "No.": 86,
+        "Question": "David has 13 balloons. Amy has 7 balloons. How many more balloons does David have than Amy?",
+        "Answer": 6.0
+    },
+    {
+        "No.": 87,
+        "Question": "There are 15 different rides at the fair. Erica has tried 6 of them. How many more rides does Erica have left to try?",
+        "Answer": 9.0
+    },
+    {
+        "No.": 88,
+        "Question": "The petting zoo costs 14 tickets. Manny has 6 tickets. How many more tickets does Manny need?",
+        "Answer": 8.0
     }
 ]
