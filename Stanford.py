@@ -67,10 +67,12 @@ class Main:
         # root is always the main action
         action_node = obj.root
         actor_node = obj.get_by_address(obj.root['deps']['nsubj'][0])
-        actee_node = obj.get_by_address(obj.root['deps']['dobj'][0])
-        # [actee] of [real object]
-        if('nmod' in actee_node['deps']):
-            actee_node = obj.get_by_address(actee_node['deps']['nmod'][0])
+        actee_node = 'None-DOBJ'
+        if('dobj' in obj.root['deps']):
+            actee_node = obj.get_by_address(obj.root['deps']['dobj'][0])
+            # [actee] of [real object]
+            if('nmod' in actee_node['deps']):
+                actee_node = obj.get_by_address(actee_node['deps']['nmod'][0])
         # KB management
         print("-------- LastEntity --------")
         for type, o in self.lastEntity.items():
@@ -108,6 +110,14 @@ class Main:
         print("======== KnowledgeBase ========")
 
     def processEntity(self,obj,target):
+        # How many does she eat
+        # No dobj to eat
+        # This also refer to previous actee
+        if(target == 'None-DOBJ'):
+            self.lastEntity['actee']['count'] = self.lastEntity['actee']['count'] + 1
+            entity = self.lastEntity['actee']['entity']
+            self.logger.debug(f'{target} means {entity.name}')
+            return entity
         #  If already processed 1 sentence before
         # And we try to refer something this time
         if(len(self.lastEntity) != 0):
@@ -180,12 +190,20 @@ class Main:
             quantity = ''
             # create property to actor
             if(action['lemma'] in own):
-                number = actorEntity.getProperty(actee['lemma'],self.kb)['quantity']
-                subj = self.construct(obj, 'nsubj')
-                if(number > 1):
-                    dobj = self.construct(obj, 'dobj', True)
+                if(actee == 'None-DOBJ'):
+                    property = self.lastEntity['actee']['entity'].name
                 else:
-                    dobj = self.construct(obj, 'dobj')
+                    property = actee['lemma']
+                    
+                number = actorEntity.getProperty(property,self.kb)['quantity']
+                subj = self.construct(obj, 'nsubj')
+                if(actee == 'None-DOBJ'):
+                    dobj = property
+                else:
+                    if(number > 1):
+                        dobj = self.construct(obj, 'dobj', True)
+                    else:
+                        dobj = self.construct(obj, 'dobj')
                 self.dataset_answer = number
                 print(f'ANSWER=>"{subj} {action["word"]} {number} {dobj}"')
 
