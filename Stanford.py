@@ -9,26 +9,41 @@ class Main:
         self.parser = CoreNLPDependencyParser(url='http://localhost:9000')
         self.kb = KnowledgeBase()
 
-    def run(self, mode=9):
+    def run(self, mode=9, target=-1):
         self.logger.debug('Starting...')
+
         sentences = []
         if(mode == 0):
             # normal input mode
             sentences = self.getInput()
-        if(mode == 9):
+            for sent in sentences:
+                self.processSent(sent)
+        elif(mode == 9):
             # example mode
+            self.logger.debug('run with Example Mode')
             sentences = ["The old man has 10 red balls.", 
                          "The man gives 3 balls away.",
                         # "How many bones altogether?"
                         "How many balls does the tall man have?"
                 ]
             self.logger.info(f'Input-Example=>{sentences}')
-        if(mode == 10):
+            for sent in sentences:
+                self.processSent(sent)
+        elif(mode == 10):
             # run dataset
-            pass
-
-        for sent in sentences:
-            self.processSent(sent)
+            from nltk.tokenize import sent_tokenize
+            self.logger.debug('run with Dataset Mode')
+            dataset = self.getDataset()
+            if(target >= 0):
+                dataset = [dataset[target]]
+            for data in dataset:
+                sentences = sent_tokenize(data['Question'])
+                answer = data['Answer']
+                # before we process each set, we reset the KnowledgeBase
+                self.kb = KnowledgeBase()
+                # process the sentences nomally
+                for sent in sentences:
+                    self.processSent(sent)
 
     def processSent(self,sent):
         self.logger.info(sent)
@@ -123,9 +138,18 @@ class Main:
         self.logger.info(f'Input=>{sentences}')
         return sentences
 
+    def getDataset(self):
+        import json
+        filename = 'MathDict/data.json'
+        if filename:
+            with open(filename, 'r') as f:
+                datastore = json.load(f)
+        return datastore
 
 main = Main()
 # mode 0 = normal
+# main.run()
 # mode 9 = example
+# main.run(mode=9)
 # mode 10 = dataset 
-main.run(mode=9)
+main.run(mode=10,target=0)
