@@ -45,6 +45,9 @@ class Main:
                 # process the sentences nomally
                 for sent in sentences:
                     self.processSent(sent)
+                print(answer, self.dataset_answer)
+                input("======================================")
+                
 
     def processSent(self,sent):
         self.logger.info(sent)
@@ -112,6 +115,7 @@ class Main:
                     elif(comparator in lt and number <= lt_temp):
                         entity = node
                         lt_temp = number
+                self.dataset_answer = entity.name
                 print(f'ANSWER=>"{entity.name}"')
         elif(tag == 'WRB'):
             # Ask for a number
@@ -124,6 +128,7 @@ class Main:
                 dobj = self.construct(obj, 'dobj')
                 if(number > 1):
                     dobj = dobj+'s'
+                self.dataset_answer = number
                 print(f'ANSWER=>"{subj} {action["word"]} {number} {dobj}"')
 
     def construct(self, obj, target):
@@ -186,4 +191,4 @@ main = Main()
 # mode 9 = example
 # main.run(mode=9)
 # mode 10 = dataset 
-main.run(mode=10,target=1)
+main.run(mode=10,target=-1)
