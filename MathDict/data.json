@@ -40,7 +40,7 @@
         "Answer": 9.0
     },
     {
-        "Question": "Sue eats 3 ear of corn. She eats 1 more. How many does she eat",
+        "Question": "Sue eats 3 ear of corn. She eats 1 more. How many ears does she eat",
         "Answer": 4.0
     },
     {
@@ -315,6 +315,4 @@
         "Question": "My sister and I made snow balls after the big storm. I made 25 snowballs. My sister made 13 more snowballs than me. How many snowballs did my sister make?",
         "Answer": 38.0
     }
-
-
 ]

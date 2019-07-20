@@ -78,6 +78,7 @@ class Main:
         print("======== LastEntity ========")
         actor = self.processEntity(obj=obj, target=actor_node)
         actee = self.processEntity(obj=obj, target=actee_node)
+        # print('aaaaaaaaaaaaaaaaa ',actee.__dict__)
         # Is this a question?
         if(obj.get_by_address(1)['tag'] in {'WRB', 'WP'}):
             # WRB => HOW
@@ -109,11 +110,19 @@ class Main:
     def processEntity(self,obj,target):
         #  If already processed 1 sentence before
         # And we try to refer something this time
-        if(len(self.lastEntity) != 0 
-            and target['lemma'] in {'he','she'}):
-            self.lastEntity['actor']['count'] = self.lastEntity['actor']['count'] + 1
-            target = self.lastEntity['actor']['entity']
-            return target
+        if(len(self.lastEntity) != 0):
+            if(target['lemma'] in {'he','she'}):
+                self.lastEntity['actor']['count'] = self.lastEntity['actor']['count'] + 1
+                entity = self.lastEntity['actor']['entity']
+                self.logger.debug(f'{target["lemma"]} means {entity.name}')
+                return entity
+            # she eats 7 more
+            # more refer to previous actee
+            elif(target['lemma'] in {'more'}):
+                self.lastEntity['actee']['count'] = self.lastEntity['actee']['count'] + 1
+                entity = self.lastEntity['actee']['entity']
+                self.logger.debug(f'{target["lemma"]} means {entity.name}')
+                return entity
 
         # create entity from the given information
         entity = Entity(sent_obj=obj,node=target)
@@ -236,6 +245,12 @@ class Main:
                         verb = '[more]'
                     if(amod['lemma'] == 'less'):
                         verb = '[less]'
+            if(actee['lemma'] == 'more'):
+                actee['lemma'] = self.lastEntity['actee']['entity'].name
+                verb = '[more]'
+            if(actee['lemma'] == 'less'):
+                actee['lemma'] = self.lastEntity['actee']['entity'].name
+                verb = '[less]'
 
         # create property to actor
         if(verb in own):
