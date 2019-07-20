@@ -20,7 +20,7 @@ class Main:
                 self.processSent(sent)
         elif(mode == 9):
             # example mode
-            self.logger.debug('run with Example Mode')
+            self.logger.info('run with Example Mode')
             sentences = ["The old man has 10 red balls.", 
                          "The man gives 3 balls away.",
                         # "How many bones altogether?"
@@ -32,15 +32,16 @@ class Main:
         elif(mode == 10):
             # run dataset
             from nltk.tokenize import sent_tokenize
-            self.logger.debug('run with Dataset Mode')
+            self.logger.info('run with Dataset Mode')
             dataset = self.getDataset()
+            # Target is for which dataset number you want to test with
             if(target >= 0):
                 dataset = [dataset[target]]
             for data in dataset:
                 sentences = sent_tokenize(data['Question'])
                 answer = data['Answer']
                 # before we process each set, we reset the KnowledgeBase
-                self.kb = KnowledgeBase()
+                self.kb.reset()
                 # process the sentences nomally
                 for sent in sentences:
                     self.processSent(sent)
@@ -61,11 +62,14 @@ class Main:
         # KB management
         actor = self.processEntity(obj=obj, target=actor_node)
         actee = self.processEntity(obj=obj, target=actee_node)
-
         # Is this a question?
-        if(obj.get_by_address(1)['tag'] == 'WRB'):
+        if(obj.get_by_address(1)['tag'] in {'WRB', 'WP'}):
+            # WRB => HOW
+            # WP => WHO
+            self.logger.debug('This is question')
             self.processQuestion(obj,actor,action_node,actee_node)
         else:
+            self.logger.debug('This is sentence')
             self.processAction(obj=obj, 
                             actorEntity=actor,
                             action=action_node,
@@ -81,16 +85,46 @@ class Main:
 
     def processQuestion(self, obj, actorEntity, action, actee):
         own = {'have'}
-        quantity = ''
         answer = ''
-        # create property to actor
-        if(action['lemma'] in own):
-            number = actorEntity.getProperty(actee['lemma'])['quantity']
-            subj = self.construct(obj, 'nsubj')
-            dobj = self.construct(obj, 'dobj')
-            if(number > 1):
-                dobj = dobj+'s'
-            print(f'ANSWER=>"{subj} {action["word"]} {number} {dobj}"')
+        # There are many type of question
+        tag = obj.get_by_address(1)['tag']
+        if(tag == 'WP'):
+            # Ask for a person
+            # start with who => tag:WP
+            if(action['lemma'] in own):
+                import math
+                # someone owns actee
+                gt = {'greater'}
+                lt = {'least'}
+                gt_temp = -math.inf
+                lt_temp = math.inf
+                entity = None
+                if(actee['lemma'] == 'number'):
+                    comparator = obj.get_by_address(actee['deps']['amod'][0])['lemma']
+                    property = obj.get_by_address(actee['deps']['nmod'][0])['lemma']
+                self.logger.info(f'Who has {comparator} {actee["lemma"]} of {property}')
+                for index, node in self.kb.memory.items():
+                    number = node.getProperty(property)['quantity']
+                    if(number == None): continue
+                    if(comparator in gt and number >= gt_temp):
+                        entity = node
+                        gt_temp = number
+                    elif(comparator in lt and number <= lt_temp):
+                        entity = node
+                        lt_temp = number
+                print(f'ANSWER=>"{entity.name}"')
+        elif(tag == 'WRB'):
+            # Ask for a number
+            # start with How many
+            quantity = ''
+            # create property to actor
+            if(action['lemma'] in own):
+                number = actorEntity.getProperty(actee['lemma'])['quantity']
+                subj = self.construct(obj, 'nsubj')
+                dobj = self.construct(obj, 'dobj')
+                if(number > 1):
+                    dobj = dobj+'s'
+                print(f'ANSWER=>"{subj} {action["word"]} {number} {dobj}"')
 
     def construct(self, obj, target):
         ret = ''
@@ -152,4 +186,4 @@ main = Main()
 # mode 9 = example
 # main.run(mode=9)
 # mode 10 = dataset 
-main.run(mode=10,target=0)
+main.run(mode=10,target=1)

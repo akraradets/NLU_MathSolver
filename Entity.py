@@ -24,7 +24,7 @@ class Entity:
     def getProperty(self,item):
         # print(f'Finnding {item} in {self.prop.keys()}')
 
-        property = {'quantity':0}
+        property = {'quantity':None}
         if(item in self.prop.keys()):
             # print(f'{item} found')
             property = self.prop[item]

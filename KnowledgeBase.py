@@ -56,3 +56,6 @@ class KnowledgeBase:
         # Dump memory to the screen
         for index, node in self.memory.items():
             print(f'index={index} node={node.__dict__}')
+
+    def reset(self):
+        self.memory = {}

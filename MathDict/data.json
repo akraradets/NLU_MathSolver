@@ -1,11 +1,11 @@
 [
     {
-        "Question": "Pete has 9 books. Ellen has 14 books. Who has the greater number of books?",
+        "Question": "Pete has 9 books. Ellen has 14 books. Who has the least number of books?",
         "Answer": "Ellen"
     },
     {
         "Question": "Yoko has 11 pencils. Tony has 15 pencils. Who has the greater number of pencils?",
-        "Answer": "Yoko"
+        "Answer": "Tony"
     },
     {
         "Question": "Sue eats 1 ear of corn. Her dad eats 2 ears of corn. How many do they eat altogether?",
