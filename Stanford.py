@@ -10,7 +10,7 @@ class Main:
         self.lastEntity = {}
         self.kb = KnowledgeBase()
 
-    def run(self, mode=9, target=-1, start=0, end=10000):
+    def run(self, mode=9, target=-1, start=1, end=10000):
         self.logger.debug('Starting...')
 
         sentences = []
@@ -38,10 +38,10 @@ class Main:
             # Target is for which dataset number you want to test with
             if(target >= 0):
                 dataset = [dataset[target]]
-            start = 10
+            # start = 1
             for i in range(start, end):
             # for data in dataset:
-                data = dataset[i]
+                data = dataset[i-1]
                 sentences = sent_tokenize(data['Question'])
                 answer = data['Answer']
                 # before we process each set, we reset the KnowledgeBase
@@ -67,10 +67,12 @@ class Main:
         # root is always the main action
         action_node = obj.root
         actor_node = obj.get_by_address(obj.root['deps']['nsubj'][0])
-        actee_node = obj.get_by_address(obj.root['deps']['dobj'][0])
-        # [actee] of [real object]
-        if('nmod' in actee_node['deps']):
-            actee_node = obj.get_by_address(actee_node['deps']['nmod'][0])
+        actee_node = 'None-DOBJ'
+        if('dobj' in obj.root['deps']):
+            actee_node = obj.get_by_address(obj.root['deps']['dobj'][0])
+            # [actee] of [real object]
+            if('nmod' in actee_node['deps']):
+                actee_node = obj.get_by_address(actee_node['deps']['nmod'][0])
         # KB management
         print("-------- LastEntity --------")
         for type, o in self.lastEntity.items():
@@ -78,6 +80,7 @@ class Main:
         print("======== LastEntity ========")
         actor = self.processEntity(obj=obj, target=actor_node)
         actee = self.processEntity(obj=obj, target=actee_node)
+        # print('aaaaaaaaaaaaaaaaa ',actee.__dict__)
         # Is this a question?
         if(obj.get_by_address(1)['tag'] in {'WRB', 'WP'}):
             # WRB => HOW
@@ -107,13 +110,29 @@ class Main:
         print("======== KnowledgeBase ========")
 
     def processEntity(self,obj,target):
+        # How many does she eat
+        # No dobj to eat
+        # This also refer to previous actee
+        if(target == 'None-DOBJ'):
+            self.lastEntity['actee']['count'] = self.lastEntity['actee']['count'] + 1
+            entity = self.lastEntity['actee']['entity']
+            self.logger.debug(f'{target} means {entity.name}')
+            return entity
         #  If already processed 1 sentence before
         # And we try to refer something this time
-        if(len(self.lastEntity) != 0 
-            and target['lemma'] in {'he','she'}):
-            self.lastEntity['actor']['count'] = self.lastEntity['actor']['count'] + 1
-            target = self.lastEntity['actor']['entity']
-            return target
+        if(len(self.lastEntity) != 0):
+            if(target['lemma'] in {'he','she'}):
+                self.lastEntity['actor']['count'] = self.lastEntity['actor']['count'] + 1
+                entity = self.lastEntity['actor']['entity']
+                self.logger.debug(f'{target["lemma"]} means {entity.name}')
+                return entity
+            # she eats 7 more
+            # more refer to previous actee
+            elif(target['lemma'] in {'more'}):
+                self.lastEntity['actee']['count'] = self.lastEntity['actee']['count'] + 1
+                entity = self.lastEntity['actee']['entity']
+                self.logger.debug(f'{target["lemma"]} means {entity.name}')
+                return entity
 
         # create entity from the given information
         entity = Entity(sent_obj=obj,node=target)
@@ -171,12 +190,20 @@ class Main:
             quantity = ''
             # create property to actor
             if(action['lemma'] in own):
-                number = actorEntity.getProperty(actee['lemma'],self.kb)['quantity']
-                subj = self.construct(obj, 'nsubj')
-                if(number > 1):
-                    dobj = self.construct(obj, 'dobj', True)
+                if(actee == 'None-DOBJ'):
+                    property = self.lastEntity['actee']['entity'].name
                 else:
-                    dobj = self.construct(obj, 'dobj')
+                    property = actee['lemma']
+                    
+                number = actorEntity.getProperty(property,self.kb)['quantity']
+                subj = self.construct(obj, 'nsubj')
+                if(actee == 'None-DOBJ'):
+                    dobj = property
+                else:
+                    if(number > 1):
+                        dobj = self.construct(obj, 'dobj', True)
+                    else:
+                        dobj = self.construct(obj, 'dobj')
                 self.dataset_answer = number
                 print(f'ANSWER=>"{subj} {action["word"]} {number} {dobj}"')
 
@@ -236,6 +263,12 @@ class Main:
                         verb = '[more]'
                     if(amod['lemma'] == 'less'):
                         verb = '[less]'
+            if(actee['lemma'] == 'more'):
+                actee['lemma'] = self.lastEntity['actee']['entity'].name
+                verb = '[more]'
+            if(actee['lemma'] == 'less'):
+                actee['lemma'] = self.lastEntity['actee']['entity'].name
+                verb = '[less]'
 
         # create property to actor
         if(verb in own):
@@ -278,4 +311,4 @@ main = Main()
 # mode 9 = example
 # main.run(mode=9)
 # mode 10 = dataset 
-main.run(mode=10,start=0)
+main.run(mode=10,start=1)
