@@ -72,6 +72,11 @@ class Main:
                 finally:
                     print(f'correct={correct} incorrect={incorrect} error={error}')
                     # input("++++++++++++++++++++++++++++++++++++++++++++++++++++++")
+            print("<<<<<<<< Evaluation Result >>>>>>>>")
+            print("Total Question:" , len(dataset))
+            print("Total Correct:", correct, f'{correct*100/len(dataset)}%')
+            print("Total Incorrect:", incorrect, f'{incorrect*100/len(dataset)}%')
+            print("Total Error:", error, f'{error*100/len(dataset)}%')
 
     def processSent(self,sent):
         self.logger.info(sent)
