@@ -563,5 +563,10 @@
         "No.": 113,
         "Question": "Lynn caught 7 butterflies. Robin caught 4 more butterflies than Lynn. How many butterflies did Robin catch?",
         "Answer": 11.0
+    },
+    {
+        "No.": 114,
+        "Question": "Jill has 56 coins. She loses 22 of them. How many coins are left?",
+        "Answer": 32.0
     }
 ]
