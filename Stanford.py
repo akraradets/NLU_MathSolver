@@ -8,6 +8,7 @@ class Main:
         self.logger = LoggerFactory(self).getLogger()
         self.parser = CoreNLPDependencyParser(url='http://localhost:9000')
         self.lastEntity = {}
+        self.dataset_answer = None
         self.kb = KnowledgeBase()
 
     def run(self, mode=9, target=-1, start=1, end=10000):
@@ -38,7 +39,7 @@ class Main:
             # Target is for which dataset number you want to test with
             if(target >= 0):
                 dataset = [dataset[target]]
-            # start = 1
+            start = 14
             for i in range(start, end):
             # for data in dataset:
                 data = dataset[i-1]
@@ -46,6 +47,7 @@ class Main:
                 answer = data['Answer']
                 # before we process each set, we reset the KnowledgeBase
                 self.kb.reset()
+                self.dataset_answer = None
                 self.lastEntity = {}
                 # process the sentences nomally
                 for sent in sentences:
@@ -66,13 +68,14 @@ class Main:
 
         # root is always the main action
         action_node = obj.root
-        actor_node = obj.get_by_address(obj.root['deps']['nsubj'][0])
-        actee_node = 'None-DOBJ'
-        if('dobj' in obj.root['deps']):
-            actee_node = obj.get_by_address(obj.root['deps']['dobj'][0])
-            # [actee] of [real object]
-            if('nmod' in actee_node['deps']):
-                actee_node = obj.get_by_address(actee_node['deps']['nmod'][0])
+        if(action_node['tag'] in {'VBZ','VB'}):
+            actor_node = obj.get_by_address(obj.root['deps']['nsubj'][0])
+            actee_node = 'None-DOBJ'
+            if('dobj' in obj.root['deps']):
+                actee_node = obj.get_by_address(obj.root['deps']['dobj'][0])
+                # [actee] of [real object]
+                if('nmod' in actee_node['deps']):
+                    actee_node = obj.get_by_address(actee_node['deps']['nmod'][0])
         # KB management
         print("-------- LastEntity --------")
         for type, o in self.lastEntity.items():
@@ -128,12 +131,11 @@ class Main:
                 return entity
             # she eats 7 more
             # more refer to previous actee
-            elif(target['lemma'] in {'more'}):
+            elif(target['lemma'] in {'more'} or target['tag'] in {'CD'}):
                 self.lastEntity['actee']['count'] = self.lastEntity['actee']['count'] + 1
                 entity = self.lastEntity['actee']['entity']
                 self.logger.debug(f'{target["lemma"]} means {entity.name}')
                 return entity
-
         # create entity from the given information
         entity = Entity(sent_obj=obj,node=target)
         # Now, we set this entity into the KnowledgeBase
@@ -141,7 +143,7 @@ class Main:
         return entity
 
     def processQuestion(self, obj, actorEntity, action, actee):
-        own = {'have', 'eat', 'buy'}
+        own = {'have', 'eat', 'buy', 'be'}
         answer = ''
         # There are many type of question
         tag = obj.get_by_address(1)['tag']
@@ -194,9 +196,31 @@ class Main:
                     property = self.lastEntity['actee']['entity'].name
                 else:
                     property = actee['lemma']
-                    
-                number = actorEntity.getProperty(property,self.kb)['quantity']
+
+                # Entity is they
+                if(actorEntity.name == 'they'):
+                    print(f"Ask for quantity of {property} owned by {actorEntity.name}")
+                    number = 0
+                    for i,node in self.kb.memory.items():
+                        no = node.getProperty(property,self.kb)['quantity']
+                        if(no != None ):
+                            number = number + no
+                # Entity is actee but ask for there existant
+                # How many [nsubj] are [there]
+                elif('expl' in action['deps']):
+                    property = actorEntity.name
+                    print(f"Ask for the existing of {property}")
+                    number = 0
+                    for i,node in self.kb.memory.items():
+                        no = node.getProperty(property,self.kb)['quantity']
+                        if(no != None ):
+                            number = number + no                   
+                else:
+                    print(f"Ask for quantity of {property} owned by {actorEntity.name}")
+                    number = actorEntity.getProperty(property,self.kb)['quantity']
+
                 subj = self.construct(obj, 'nsubj')
+
                 if(actee == 'None-DOBJ'):
                     dobj = property
                 else:
@@ -204,6 +228,7 @@ class Main:
                         dobj = self.construct(obj, 'dobj', True)
                     else:
                         dobj = self.construct(obj, 'dobj')
+
                 self.dataset_answer = number
                 print(f'ANSWER=>"{subj} {action["word"]} {number} {dobj}"')
 
@@ -249,6 +274,11 @@ class Main:
                         verb = '[more]'
                     if(amod['lemma'] == 'less'):
                         verb = '[less]'
+        # Sam has [3]
+        # 3 is dobj
+        elif(actee['tag'] == 'CD'):
+            quantity = int(actee['lemma'])
+            actee['lemma'] = self.lastEntity['actee']['entity'].name
         else:
             # 3 [actee]
             self.logger.debug("[This is head]")
