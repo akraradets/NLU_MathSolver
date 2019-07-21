@@ -6,6 +6,7 @@ class KnowledgeBase:
         self.logger = LoggerFactory(self).getLogger()
         # This will be the dictionary of entities
         self.memory = {}
+        self.runNo = 0
 
     def get(self,index):
         # if entity is exist, return that entity, else return new entity
@@ -15,11 +16,14 @@ class KnowledgeBase:
             return Entity()
 
     def set(self,entity):
-        node = self.find(entity)
+        node, isNew = self.find(entity)
+        if(isNew):
+            node.index = str(self.runNo) + "_" + node.name
+            self.runNo = self.runNo + 1
         # update the node with entity
         node.updateAttr(entity)
         # save new entity to the memory with the index
-        self.memory[node.name] = node
+        self.memory[node.index] = node
         return node
 
     def find(self,entity):
@@ -31,12 +35,11 @@ class KnowledgeBase:
         # this is new entity
         if(len(candidates) == 0):
             self.logger.debug(f'0 [{entity.name}] found')
-            # find_by_alias
-            return entity
+            return entity, True
         # this one candidate is the entity
         elif(len(candidates) == 1):
             self.logger.debug(f'1 [{entity.name}] found')
-            return candidates[0]
+            return candidates[0], False
         # we have more than one candidates
         # check through the candidates list for who has the best match amod
         # Best match => + if amod exist - if lack in either of lsit
@@ -51,7 +54,7 @@ class KnowledgeBase:
             if(score > max_score):
                 max_score = score
                 selected = cand
-        return selected
+        return selected, False
         
     def dump(self):
         # Dump memory to the screen

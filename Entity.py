@@ -4,6 +4,7 @@ class Entity:
     def __init__(self,sent_obj,node):
         # we name the entity after its main lemma node
         self.name = node['lemma'].lower()
+        self.index = None
         self.alias = self.name
         self.attr = set()
         # You own something from the KnowledgeBase
