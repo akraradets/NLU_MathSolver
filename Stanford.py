@@ -11,7 +11,7 @@ class Main:
         self.dataset_answer = None
         self.kb = KnowledgeBase()
 
-    def run(self, mode=9, target=-1, start=1, end=10000):
+    def run(self, mode=0, target=-1, start=1, end=10000):
         self.logger.debug('Starting...')
 
         sentences = []
@@ -23,10 +23,13 @@ class Main:
         elif(mode == 9):
             # example mode
             self.logger.info('run with Example Mode')
-            sentences = ["The old man has 10 red balls.", 
-                         "The man gives 3 balls away.",
+            sentences = ["The old man has 10 red balls.",
+                        "The lady has 5 blue balls",
+                        "The man gives 3 balls away.",
+                        "The man gives 3 balls to the lady.",
+                        # "The lady gets 1 balls.",
                         # "How many bones altogether?"
-                        "How many balls does the tall man have?"
+                        "How many balls does the lady have?"
                 ]
             self.logger.info(f'Input-Example=>{sentences}')
             for sent in sentences:
@@ -39,7 +42,7 @@ class Main:
             # Target is for which dataset number you want to test with
             if(target >= 0):
                 dataset = [dataset[target]]
-            start = 14
+            start = 24
             for i in range(start, end):
             # for data in dataset:
                 data = dataset[i-1]
@@ -68,7 +71,7 @@ class Main:
 
         # root is always the main action
         action_node = obj.root
-        if(action_node['tag'] in {'VBZ','VB'}):
+        if(action_node['tag'] in {'VBZ','VB', 'VBP'}):
             actor_node = obj.get_by_address(obj.root['deps']['nsubj'][0])
             actee_node = 'None-DOBJ'
             if('dobj' in obj.root['deps']):
@@ -76,6 +79,19 @@ class Main:
                 # [actee] of [real object]
                 if('nmod' in actee_node['deps']):
                     actee_node = obj.get_by_address(actee_node['deps']['nmod'][0])
+            # if(action_node['tag'] == 'VBP'):
+            #     actee_node = actor_node
+            #     actor_node = 'None-NSUBJ'
+        # 9 children [are/cop] at the [party/ROOT].
+        elif('cop' in obj.root['deps']):
+            action_node = obj.get_by_address(obj.root['deps']['cop'][0])
+            actor_node = obj.root
+            actee_node = obj.get_by_address(obj.root['deps']['nsubj'][0])
+        else:
+            actor_node = obj.root
+            # action_node['lemma'] = 'be'
+            actee_node = 'None-DOBJ'
+            pass
         # KB management
         print("-------- LastEntity --------")
         for type, o in self.lastEntity.items():
@@ -116,6 +132,11 @@ class Main:
         # How many does she eat
         # No dobj to eat
         # This also refer to previous actee
+        if(target == 'None-NSUBJ'):
+            self.lastEntity['actor']['count'] = self.lastEntity['actor']['count'] + 1
+            entity = self.lastEntity['actor']['entity']
+            self.logger.debug(f'{target} means {entity.name}')
+            return entity
         if(target == 'None-DOBJ'):
             self.lastEntity['actee']['count'] = self.lastEntity['actee']['count'] + 1
             entity = self.lastEntity['actee']['entity']
@@ -191,15 +212,15 @@ class Main:
             # start with How many
             quantity = ''
             # create property to actor
-            if(action['lemma'] in own):
+            if(action['lemma'] in own or action['tag'] in {'NN','NNS'}):
                 if(actee == 'None-DOBJ'):
                     property = self.lastEntity['actee']['entity'].name
                 else:
                     property = actee['lemma']
 
                 # Entity is they
-                if(actorEntity.name == 'they'):
-                    print(f"Ask for quantity of {property} owned by {actorEntity.name}")
+                if(actorEntity.name == 'they' or action['tag'] in {'NN', 'NNS'}):
+                    print(f"Ask for quantity of {property} owned by they")
                     number = 0
                     for i,node in self.kb.memory.items():
                         no = node.getProperty(property,self.kb)['quantity']
@@ -233,6 +254,8 @@ class Main:
                 print(f'ANSWER=>"{subj} {action["word"]} {number} {dobj}"')
 
     def construct(self, obj, target, plural = False):
+        if(obj.root['tag'] in {'NN', 'NNS'}):
+            return obj.root['lemma']
         ret = ''
         main = obj.get_by_address(obj.root['deps'][target][0])
         if('det' in main['deps']):
@@ -253,7 +276,7 @@ class Main:
         return ret                
 
     def processAction(self,obj,actorEntity,action,actee):
-        own = {'have', 'eat', 'buy'}
+        own = {'have', 'eat', 'buy', 'be', 'come', 'pick'}
         add = {'[more]', 'get'}
         sub = {'[less]', 'give'}
         quantity = 'some'
@@ -315,6 +338,14 @@ class Main:
             item = actorEntity.getProperty(actee['lemma'], self.kb)
             number = item['quantity'] - quantity
             actorEntity.setProperty(item['name'], number)
+            # give to [someone]
+            if('nmod' in action['deps']):
+                someone = obj.get_by_address(action['deps']['nmod'][0])
+                someone = self.processEntity(obj,someone)
+                someone_item = someone.getProperty(actee['lemma'], self.kb)
+                if(someone_item['quantity'] == None): someone_item['quantity'] = 0
+                someone_number = someone_item['quantity'] + quantity
+                someone.setProperty(item['name'], someone_number)
 
     def getInput(self):
         print("Enter Text. When you are done, type Q")
@@ -339,6 +370,6 @@ main = Main()
 # mode 0 = normal
 # main.run()
 # mode 9 = example
-# main.run(mode=9)
+main.run(mode=9)
 # mode 10 = dataset 
-main.run(mode=10,start=1)
+# main.run(mode=10,start=1)
