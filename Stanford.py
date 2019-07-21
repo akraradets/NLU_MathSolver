@@ -25,11 +25,9 @@ class Main:
             self.logger.info('run with Example Mode')
             sentences = ["The old man has 10 red balls.",
                         "The lady has 5 blue balls",
-                        "The man gives 3 balls away.",
-                        "The man gives 3 balls to the lady.",
-                        # "The lady gets 1 balls.",
-                        # "How many bones altogether?"
-                        "How many balls does the lady have?"
+                        "The man gives 3 away to his son.",
+                        "The man gives 3 to the lady.",
+                        "How many balls does the man have?"
                 ]
             self.logger.info(f'Input-Example=>{sentences}')
             for sent in sentences:
@@ -338,8 +336,18 @@ class Main:
             item = actorEntity.getProperty(actee['lemma'], self.kb)
             number = item['quantity'] - quantity
             actorEntity.setProperty(item['name'], number)
+            # give away to [someone]
+            if('advmod' in action['deps']):
+                advmod = obj.get_by_address(action['deps']['advmod'][0])
+                if('nmod' in advmod['deps']):
+                    someone = obj.get_by_address(advmod['deps']['nmod'][0])
+                    someone = self.processEntity(obj,someone)
+                    someone_item = someone.getProperty(actee['lemma'], self.kb)
+                    if(someone_item['quantity'] == None): someone_item['quantity'] = 0
+                    someone_number = someone_item['quantity'] + quantity
+                    someone.setProperty(item['name'], someone_number)
             # give to [someone]
-            if('nmod' in action['deps']):
+            elif('nmod' in action['deps']):
                 someone = obj.get_by_address(action['deps']['nmod'][0])
                 someone = self.processEntity(obj,someone)
                 someone_item = someone.getProperty(actee['lemma'], self.kb)
