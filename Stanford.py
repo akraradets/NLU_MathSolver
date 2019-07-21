@@ -10,7 +10,7 @@ class Main:
         self.lastEntity = {}
         self.kb = KnowledgeBase()
 
-    def run(self, mode=9, target=-1, start=0, end=10000):
+    def run(self, mode=9, target=-1, start=1, end=10000):
         self.logger.debug('Starting...')
 
         sentences = []
@@ -38,10 +38,10 @@ class Main:
             # Target is for which dataset number you want to test with
             if(target >= 0):
                 dataset = [dataset[target]]
-            start = 10
+            # start = 1
             for i in range(start, end):
             # for data in dataset:
-                data = dataset[i]
+                data = dataset[i-1]
                 sentences = sent_tokenize(data['Question'])
                 answer = data['Answer']
                 # before we process each set, we reset the KnowledgeBase
@@ -311,4 +311,4 @@ main = Main()
 # mode 9 = example
 # main.run(mode=9)
 # mode 10 = dataset 
-main.run(mode=10,start=0)
+main.run(mode=10,start=1)
