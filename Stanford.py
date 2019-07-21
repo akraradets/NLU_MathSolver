@@ -25,9 +25,9 @@ class Main:
             self.logger.info('run with Example Mode')
             sentences = ["The old man has 10 red balls.",
                         "The lady has 5 blue balls",
-                        "The man gives 3 away to his son.",
-                        "The man gives 3 to the lady.",
-                        "How many balls does the man have?"
+                        # "The man gives 3 away to his son.",
+                        # "The man gives 3 to the lady.",
+                        # "How many balls does the man have?"
                 ]
             self.logger.info(f'Input-Example=>{sentences}')
             for sent in sentences:
@@ -40,23 +40,38 @@ class Main:
             # Target is for which dataset number you want to test with
             if(target >= 0):
                 dataset = [dataset[target]]
-            start = 24
-            for i in range(start, end):
-            # for data in dataset:
-                data = dataset[i-1]
-                sentences = sent_tokenize(data['Question'])
-                answer = data['Answer']
-                # before we process each set, we reset the KnowledgeBase
-                self.kb.reset()
-                self.dataset_answer = None
-                self.lastEntity = {}
-                # process the sentences nomally
-                for sent in sentences:
-                    self.processSent(sent)
-                print(f'[{i}] {data["Question"]}')
-                print(f'DatasetAnswer={answer}|BotAnswer={self.dataset_answer}')
-                input("++++++++++++++++++++++++++++++++++++++++++++++++++++++")
-                
+            correct = 0
+            incorrect = 0
+            error = 0
+            # start = 24
+            if(end > len(dataset)):
+                end = len(dataset)
+            for i in range(start, end+1):
+                try:
+                    data = dataset[i-1]
+                    sentences = sent_tokenize(data['Question'])
+                    answer = data['Answer']
+                    # before we process each set, we reset the KnowledgeBase
+                    self.kb.reset()
+                    self.dataset_answer = None
+                    self.lastEntity = {}
+                    # process the sentences nomally
+                    for sent in sentences:
+                        self.processSent(sent)
+                    print(f'[{i}] {data["Question"]}')
+                    print(f'DatasetAnswer={answer}|BotAnswer={self.dataset_answer}')
+                    if(isinstance(answer, float) and float(answer) == float(self.dataset_answer)):
+                        correct = correct + 1
+                    elif(isinstance(answer, str) and answer.lower() == self.dataset_answer.lower()):
+                        correct = correct + 1
+                    else:
+                        incorrect = incorrect + 1
+                except Exception as e:
+                    print(str(e))
+                    error = error + 1
+                finally:
+                    print(f'correct={correct} incorrect={incorrect} error={error}')
+                    # input("++++++++++++++++++++++++++++++++++++++++++++++++++++++")
 
     def processSent(self,sent):
         self.logger.info(sent)
@@ -378,6 +393,6 @@ main = Main()
 # mode 0 = normal
 # main.run()
 # mode 9 = example
-main.run(mode=9)
+# main.run(mode=9)
 # mode 10 = dataset 
-# main.run(mode=10,start=1)
+main.run(mode=10,start=1)
