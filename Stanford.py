@@ -20,6 +20,16 @@ class Main:
             sentences = self.getInput()
             for sent in sentences:
                 self.processSent(sent)
+
+        elif(mode == 1):
+            # Continuous Mode
+            print("Enter Text. When you are done, type Q")
+            while True:
+                temp = (input("Enter sentence: "))
+                if temp == "Q":
+                    break
+                self.processSent(temp)
+                
         elif(mode == 9):
             # example mode
             self.logger.info('run with Example Mode')
@@ -28,6 +38,7 @@ class Main:
                         # "The man gives 3 away to his son.",
                         # "The man gives 3 to the lady.",
                         # "How many balls does the man have?"
+                         "Who has the greater number of ball?"
                 ]
             self.logger.info(f'Input-Example=>{sentences}')
             for sent in sentences:
@@ -397,7 +408,9 @@ class Main:
 main = Main()
 # mode 0 = normal
 # main.run()
+# mode 1 = Continuous Run
+main.run(mode = 1)
 # mode 9 = example
 # main.run(mode=9)
 # mode 10 = dataset 
-main.run(mode=10,start=1)
+# main.run(mode=10,start=1)
