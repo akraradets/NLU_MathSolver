@@ -1,0 +1,34 @@
+>>> verbnet.classids('drink')
+['eat-39.1-2']
+>>> verbnet.vnclass('39.1-2')
+<Element 'VNSUBCLASS' at 0x7f0857a5c228>
+>>> v=verbnet.vnclass('39.1-2')
+>>> verbnet.pprint(v)
+'eat-39.1-2
+  Subclasses: (none)
+  Members: drink
+  Thematic roles:
+    * Patient[+comestible -solid]
+  Frames:
+    Basic Transitive
+      Example: Cynthia drank the wine.
+      Syntax: NP[Agent] VERB NP[Patient]
+      Semantics:
+        * take_in(during(E), Agent, Patient)
+    Unspecified Object
+      Example: Cynthia drank.
+      Syntax: NP[Agent] VERB
+      Semantics:
+        * take_in(during(E), Agent, ?Patient)
+    NP-ADJP (Resultative)
+      Example: Cythia drank herself sick.
+      Syntax: NP[Agent] VERB NP[Oblique +refl] ADJ
+      Semantics:
+        * take_in(during(E), Agent, ?Patient)
+        * Pred(result(E), Oblique)
+    PP (Source-PP)
+      Example: He drank out of the goblet.
+      Syntax: NP[Agent] VERB PREP[+src] NP[Source]
+      Semantics:
+        * take_in(during(E), Agent, ?Patient)
+        * Prep(during(E), ?Patient, Source)'
