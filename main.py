@@ -1,8 +1,10 @@
-from LoggerFactory import LoggerFactory
+from systems.LoggerFactory import LoggerFactory
 from CorpusFactory import CorpusFactory
 from nltk import word_tokenize
 from nltk.lm.preprocessing import pad_both_ends
 from nltk import pos_tag
+
+
 class Main:
     def __init__(self):
         self.logger = LoggerFactory(self).getLogger()
