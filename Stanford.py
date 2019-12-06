@@ -1,4 +1,4 @@
-from LoggerFactory import LoggerFactory
+from systems.LoggerFactory import LoggerFactory
 from KnowledgeBase import KnowledgeBase
 from Entity import Entity
 from nltk.parse.corenlp import CoreNLPDependencyParser

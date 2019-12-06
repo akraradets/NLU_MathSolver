@@ -1,56 +1,38 @@
 from systems.LoggerFactory import LoggerFactory
-# from systems.CorpusFactory import CorpusFactory
-from nltk import word_tokenize
-from nltk.lm.preprocessing import pad_both_ends
-from nltk import pos_tag
+from nltk.parse.corenlp import CoreNLPDependencyParser
 
 class Main:
     def __init__(self):
         self.logger = LoggerFactory(self).getLogger()
+        self.parser = CoreNLPDependencyParser(url='http://localhost:9000')
+        self.dataset_answer = None
 
-    def run(self, nGram=2 , example=False):
+        self.verbTagList = ["VB","VBD","VBG","VBN","VBP","VBZ"]
+
+    def run(self, mode=0, target=-1, start=1, end=10000):
         self.logger.debug('Starting...')
-        sents = self.getInput(example)
-        # ['I am batman', 'You are superman']
-        sents = self.tokenize(sents,nGram)
-        # [['I', 'am', 'batman'], ['You', 'are', 'superman']]
-        self.tagged = self.posTag(sents)
-        # print(tagged)
-        # return tagged
-
-    def getInput(self,example):
-        if example == True:
-            sentences = ['I am batman', 'You are superman']
-            self.logger.info(f'Input-Example=>{sentences}')
-            return sentences
-        print("Enter Text. When you are done, type Q")
         sentences = []
-        while True:
-            temp = (input("Enter sentence: "))
-            if temp == "Q":
-                break
-            sentences.append(temp)
-        self.logger.info(f'Input=>{sentences}')
-        return sentences
+        sentences.append("Sue drinks 3 carrots.")
+        for sent in sentences:
+            self.processSentence(sent)
+    
+    def processSentence(self,sent):
+        self.logger.info(sent)
+        parsed = self.parser.parse(sent.split())
+        # Have to load the object before we can read
+        obj = []
+        for p in parsed:
+            obj = p
+        self.logger.debug(obj)
 
-    def tokenize(self, sentences, nGram=2):
-        # ['I am batman', 'You are superman']
-        for index in range(len(sentences)):
-            sent = sentences[index]
-            tokenized = word_tokenize(sent)
-            padded = list(pad_both_ends(tokenized,n=nGram))
-            sentences[index] = padded
-            
-        self.logger.debug(f'Tokenize=>{sentences}')
-        return sentences
-
-    def posTag(self, sentences):
-        tagged = []
-        for index in range(len(sentences)):
-            tagged.append(pos_tag(sentences[index]))
-        self.logger.debug(f'Tagged=>{tagged}')
-        return tagged
+        # root is always the main action
+        root = obj.root
+        # check if root is verb
+        if(root['tag'] not in self.verbTagList):
+            self.logger.error(f'root is not a verb')
+            self.logger.debug(f'{root}')
+        
 
 main = Main()
-main.run(example=False,nGram=2)
+main.run()
 # main.run()

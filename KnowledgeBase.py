@@ -1,4 +1,4 @@
-from LoggerFactory import LoggerFactory
+from systems.LoggerFactory import LoggerFactory
 from Entity import Entity
 
 class KnowledgeBase:

@@ -1,4 +1,4 @@
-from LoggerFactory import LoggerFactory
+from systems.LoggerFactory import LoggerFactory
 
 class Entity:
     def __init__(self,sent_obj,node):
