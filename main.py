@@ -1,9 +1,8 @@
 from systems.LoggerFactory import LoggerFactory
-from CorpusFactory import CorpusFactory
+# from systems.CorpusFactory import CorpusFactory
 from nltk import word_tokenize
 from nltk.lm.preprocessing import pad_both_ends
 from nltk import pos_tag
-
 
 class Main:
     def __init__(self):
@@ -15,7 +14,9 @@ class Main:
         # ['I am batman', 'You are superman']
         sents = self.tokenize(sents,nGram)
         # [['I', 'am', 'batman'], ['You', 'are', 'superman']]
-        tagged = self.posTag(sents)
+        self.tagged = self.posTag(sents)
+        # print(tagged)
+        # return tagged
 
     def getInput(self,example):
         if example == True:
@@ -51,5 +52,5 @@ class Main:
         return tagged
 
 main = Main()
-main.run(example=True,nGram=2)
+main.run(example=False,nGram=2)
 # main.run()

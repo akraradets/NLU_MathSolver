@@ -1,4 +1,4 @@
-from LoggerFactory import LoggerFactory
+from systems.LoggerFactory import LoggerFactory
 from nltk import corpus
 from nltk import FreqDist, ConditionalFreqDist, UnigramTagger ,BigramTagger
 
@@ -12,7 +12,7 @@ class CorpusFactory:
         tagged_words = self.corpus.tagged_words(categories=cat)
         tagged_sents = self.corpus.tagged_sents(categories=cat)
         fd = FreqDist(words)
-        cfd = ConditionalFreqDist(self.tagged_words)
+        cfd = ConditionalFreqDist(tagged_words)
         most_freq_words = fd.most_common(1000000)
         likely_tags = dict((word, cfd[word].max()) for (word, _) in most_freq_words)
         self.unigram = UnigramTagger(model=likely_tags)

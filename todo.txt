@@ -1,0 +1,8 @@
+TODO
+====
+
+"Sue drinks 3 carrots."
+
+1. Break this down with standford parser
+2. Analyze tag sequence and compare with verbnet
+ 
