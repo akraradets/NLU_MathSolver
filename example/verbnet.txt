@@ -1,5 +1,5 @@
 http://www.nltk.org/_modules/nltk/corpus/reader/verbnet.html
-
+from nltk.corpus import verbnet
 >>> verbnet.classids('drink')
 ['eat-39.1-2']
 >>> verbnet.vnclass('39.1-2')
