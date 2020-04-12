@@ -1,0 +1,92 @@
+{
+    "_id": {
+        "$oid": "5e6e7c74f662fe3c4ced0c91"
+    },
+    "from": {
+        "$oid": "5e6e1297a1a01a292026cf8a"
+    },
+    "page": {
+        "$numberInt": "42"
+    },
+    "unit": {
+        "$numberInt": "4"
+    },
+    "number": null,
+    "question_raw": "8 ants were marching. 3 stopped. How many ants were still marching?",
+    "question": [
+        {
+            "sequence": {
+                "$numberInt": "1"
+            },
+            "type": "statement",
+            "text": "8 ants were marching.",
+            "action": {
+                "word": "were",
+                "lemma": "are",
+                "semantic": "possess"
+            },
+            "arguments": [
+                {
+                    "word": "Sun Bear",
+                    "lemma": "sun bear"
+                }
+            ],
+            "entity": {
+                "word": "honeycombs",
+                "lemma": "honeycomb",
+                "quantity": {
+                    "$numberInt": "3"
+                }
+            }
+        },
+        {
+            "sequence": {
+                "$numberInt": "2"
+            },
+            "type": "statement",
+            "text": "Sun Bear ate all 3 of them.",
+            "action": {
+                "word": "ate",
+                "lemma": "eat",
+                "semantic": "transfer-out"
+            },
+            "arguments": [
+                {
+                    "word": "Sun Bear",
+                    "lemma": "sun bear"
+                }
+            ],
+            "entity": {
+                "word": "them",
+                "lemma": "them",
+                "quantity": {
+                    "$numberInt": "3"
+                }
+            }
+        },
+        {
+            "sequence": {
+                "$numberInt": "3"
+            },
+            "type": "question",
+            "text": "How many honeycombs were left?",
+            "action": {
+                "word": "were left",
+                "lemma": "are left",
+                "semantic": "possess"
+            },
+            "arguments": [],
+            "entity": {
+                "word": "honeycombs",
+                "lemma": "honeycomb"
+            },
+            "query": {
+                "word": "How many",
+                "lemma": "how many"
+            }
+        }
+    ],
+    "answer": {
+        "$numberInt": "0"
+    }
+}

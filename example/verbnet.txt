@@ -1,3 +1,11 @@
+https://github.com/nltk/nltk/issues/2015
+import nltk
+v3 = nltk.corpus.util.LazyCorpusLoader(
+    'verbnet3', nltk.corpus.reader.verbnet.VerbnetCorpusReader,
+    r'(?!\.).*\.xml')
+v3.classids('add') # returns ['mix-22.1-2', 'multiply-108', 'say-37.7-1']
+
+
 http://www.nltk.org/_modules/nltk/corpus/reader/verbnet.html
 from nltk.corpus import verbnet
 >>> verbnet.classids('drink')

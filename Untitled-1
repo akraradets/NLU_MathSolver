@@ -1,0 +1,14 @@
+from nltk.tree import ParentedTree
+ptree = ParentedTree.fromstring(treeObj.pprint())
+
+def traverse(t):
+    try:
+        t.label()
+    except AttributeError:
+        return
+    else:
+        if t.height() == 2:   #child nodes
+            print(t.parent())
+            return
+        for child in t:
+            traverse(child)

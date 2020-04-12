@@ -2,6 +2,9 @@ TODO
 ====
 
 "Sue drinks 3 carrots."
+"Sue has 3 coffees."
+"3 kites got caught in trees."
+"1 went down and broke."
 
 1. Break this down with standford parser
 2. Analyze tag sequence and compare with verbnet
