@@ -10,7 +10,7 @@ class LoggerFactory:
     def __init__(self, callerClass):
         format = '%(asctime)s-%(name)s(%(funcName)s)-%(levelname)s|%(message)s'
         path = './logs/'
-        file = datetime.datetime.now().strftime('%Y%m%d') + '.log'
+        file = datetime.datetime.now().strftime('%Y%m%d-%H') + '.log'
         dateFormat = '%Y%m%d %H:%M:%S'
         logging.basicConfig(format=format, filename=path+file, datefmt=dateFormat)
         self.logger = logging.getLogger(callerClass.__class__.__name__)
