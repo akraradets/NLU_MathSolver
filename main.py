@@ -7,6 +7,7 @@ import nltk
 from SRL import SRL
 from ConParser import ConParser
 from WordProcessor import WordProcessor
+from MSCorpus import MSCorpus, ProblemClass
 
 class Main:
   def __init__(self):
@@ -18,9 +19,14 @@ class Main:
     cParser = ConParser.getInstance()
     self.logger.debug('Init SRL')
     srl = SRL.getInstance()
+    self.logger.debug('Init WordProcessor')
+    wp = WordProcessor.getInstance()
+    self.logger.debug('Init MSCorpus')
+    msc = MSCorpus.getInstance()
     self.logger.debug('Run question')
 
     # question = "Sam has 5 apples. Sam eats 3 apples. How many apples does Sam have?"
+    # question = "Sam has 5 apples. Sam eats 3 apples. How many apples does Sam have left?"
     question = "Sam has 5 apples. Sam eats 3 apples. How many apples does Sam eat?"
     # question = "Sam has 5 apples. Sam eats 3 apples. How many apples are in Sam's Stomach?"
     # question = "Sam has 5 apples. Sam eats 3 apples. How many apples are with Sam?"
@@ -35,7 +41,7 @@ class Main:
 
     # 1. Split the string into sentences.
     sentences = sent_tokenize(question)
-    self.logger.debug(f"question: {sentences}")
+    self.logger.debug(f"question:{sentences}")
 
     # 2. Usually, the last sentence is the query statement. Use that to identify problem class.
     # find query statement
@@ -46,7 +52,7 @@ class Main:
       pos_sentences.append(pos_sent)
       isWh = pos_sent[0] == "WRB"
       wh_sentences.append(isWh)
-      self.logger.debug(f"sentence: {sent} | pos: {pos_sent} | isWh: {isWh}")
+      self.logger.debug(f"sentence:{sent}|pos:{pos_sent}|isWh:{isWh}")
 
     # pos_sentences
     # >>> [['NNP', 'VBZ', 'CD', 'NNS', '.'], 
@@ -56,16 +62,26 @@ class Main:
     # >>> [False, False, True]
 
     queryStatement = sentences[wh_sentences.index(True)]
-    self.logger.debug(f"queryStatement: {queryStatement}")
+    self.logger.debug(f"queryStatement:{queryStatement}")
     # 2.1 Check the type of question (What, Where, When, Why, How).
     pass
 
     # 2.2 Extract verb.
     verbs = srl.parse(queryStatement)
-    self.logger.debug(f"verbs: {verbs}")
-    self.logger.debug(f"SRL-Dump: {srl.results}")
+    self.logger.debug(f"verbs:{verbs}")
+    self.logger.debug(f"SRL-Dump:{srl.results}")
 
+    verb = verbs[0]
     # 2.3 Use both information to identify problem class.
+    lemma = wp.getLemma(verb)
+    self.logger.debug(f"TargetVerb:{verb}|Lemma:{lemma}")
+    probClass = msc.getProblemClass(lemma)
+    self.logger.debug(f"ProblemClass:{ProblemClass.getName(probClass)}")
+
+    # 3. Process each sentence according to the problem class.  
+
+
+
 
 
 main = Main()

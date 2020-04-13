@@ -7,16 +7,16 @@ class ConParser:
   @staticmethod 
   def getInstance():
     if ConParser.__instance == None:
-        ConParser()
+      ConParser()
     return ConParser.__instance
 
   def __init__(self):
     if ConParser.__instance != None:
-        raise Exception("This class is a Singleton!")
+      raise Exception("This class is a Singleton!")
     else:
-        self.logger = LoggerFactory(self).getLogger()
-        self.predictor = Predictor.from_path("libs/allennlp-conParser.tar.gz")
-        ConParser.__instance = self
+      self.logger = LoggerFactory(self).getLogger()
+      self.predictor = Predictor.from_path("libs/allennlp-conParser.tar.gz")
+      ConParser.__instance = self
 
   def parse(self, sentence):
     # reset results
