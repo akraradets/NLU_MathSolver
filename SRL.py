@@ -4,7 +4,6 @@ from allennlp.predictors.predictor import Predictor
 class SRL:
   __instance = None
   
-
   @staticmethod 
   def getInstance():
     if SRL.__instance == None:

@@ -6,6 +6,8 @@
 - [Standford Dependency tree](https://stackoverflow.com/questions/7443330/how-do-i-do-dependency-parsing-in-nltk)
 - [Standford Core NLP](https://github.com/nltk/nltk/wiki/Stanford-CoreNLP-API-in-NLTK)
 - [Standford Core NLP - RUN](https://corenlp.run/)
+- [Penn Tree POS](https://www.ling.upenn.edu/courses/Fall_2003/ling001/penn_treebank_pos.html)
+
 
 Team member
 ===========

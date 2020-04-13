@@ -58,4 +58,22 @@ fi
 echo "Create symlink"
 ln -s $FILE2 $LINK2
 
+FILE3="elmo-constituency-parser-2018.03.14.tar.gz"
+LINK3="allennlp-conParser.tar.gz"
+if [ -f "$FILE3" ]
+then
+    echo "File $FILE3 exists." 
+else
+    echo "Download $FILE3" 
+    wget https://s3-us-west-2.amazonaws.com/allennlp/models/$FILE3
+fi
+
+if [ -L "$LINK3" ]
+then
+    rm $LINK3
+fi
+
+echo "Create symlink"
+ln -s $FILE3 $LINK3
+
 echo "SUCCESS....!!!"
