@@ -21,15 +21,20 @@ class ConParser:
   def parse(self, sentence):
     # reset results
     self.results = None
+    self.labels = None
+    self.words = None
+    
     results = self.predictor.predict(
       sentence=sentence
     )
     # save results
     self.results = results
-    # print(results)
+    self.labels = results['pos_tags']
+    self.words = results['tokens']
+    return self.labels
 
-cParser = ConParser.getInstance()
-print("============== 1 ========================")
-cParser.parse("How many apples does Sam eat?")
-print("============== 2 ========================")
-cParser.parse("How many apples does Sam eat?")
+# cParser = ConParser.getInstance()
+# pos = cParser.parse("How many apples does Sam eat?")
+# words = cParser.words
+# for w,p in zip(words,pos):
+#   print(w,p)

@@ -18,7 +18,7 @@ class SRL:
         self.predictor = Predictor.from_path("libs/allennlp-SRL.tar.gz")
         SRL.__instance = self
 
-  def tag(self, sentence, withAux = False):
+  def parse(self, sentence, withAux = False):
     # reset results
     self.results = None
     results = self.predictor.predict(
@@ -96,7 +96,7 @@ class SRL:
     # return 'e'
 
 # srl = SRL.getInstance()
-# verbs = srl.tag("Did Uriah honestly think he could beat The Legend of Zelda in under three hours?")
+# verbs = srl.parse("Did Uriah honestly think he could beat The Legend of Zelda in under three hours?")
 # print(verbs)
 # print("== Role ==")
 # print(srl.getRoleSet('think'))
