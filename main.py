@@ -28,7 +28,7 @@ class Main:
     equation = ""
     # question = "Sam has 5 apples. Sam eats 3 apples. How many apples does Sam have?"
     # question = "Sam has 5 apples. Sam eats 3 apples. How many apples does Sam have left?"
-    question = "Sam has 5 apples. Sam eats 3 apples.  Sam eats 10 more apples. How many apples does Sam eat?"
+    question = "Sam has 5 apples. Sam eats 3 apples. Sam consumes 10 more apples. How many apples does Sam eat?"
     # question = "Sam has 5 apples. Sam eats 3 apples.  Sam eats 10 more apples. How many apples does Sam eat?"
     # question = "Sam has 5 apples. Sam eats 3 apples. How many apples are in Sam's Stomach?"
     # question = "Sam has 5 apples. Sam eats 3 apples. How many apples are with Sam?"
@@ -84,6 +84,7 @@ class Main:
     statements = [sentences[index] for index, isWh in enumerate(wh_sentences) if isWh == False]
     self.logger.debug(f"Statements:{statements}")
 
+    # """ ============== DEDUCTIVE ============== """
     if(detectedClass == ProblemClass.DEDUCTIVE):
       # extract target_actor and target_entity from question
       # [usually] actor is tag with ARG0
@@ -137,20 +138,23 @@ class Main:
         
         # Same deduction action
         self.logger.debug(f"Statement-{index}|lemma:{lemma}|actor:{actor}|entity:{entity}|number:{number}")
-        if(lemma == target_lemma and actor == target_actor and entity == target_entity):
-          self.logger.debug(f"Statement-{index}| a concerned phrases")
+
+        # Calculate Similarity of lemma
+        if(wp.isSimilar(lemma, target_lemma, 'v') and actor == target_actor and entity == target_entity):
+          self.logger.debug(f"Statement-{index}|a concerned phrases")
           if(equation == ""):
             equation = number
           else:
             equation = f"{equation} + {number}"
         else:
           # Probably not relate to our concern
-          self.logger.debug(f"Statement-{index}| XXXX not a concerned phrases XXXX")
-          pass
+          self.logger.debug(f"Statement-{index}|XXXX not a concerned phrases XXXX")
 
         print(equation)
 
-    elif(detectedClass == ProblemClass.POSESSIVE):
+    # """ ============== POSSESSIVE ============== """
+    elif(detectedClass == ProblemClass.POSSESSIVE):
+      
       pass
     else:
       raise ValueError(f"Incorrect problem class:{detectedClass}") 

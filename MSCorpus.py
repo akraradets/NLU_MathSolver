@@ -3,15 +3,15 @@ from allennlp.predictors.predictor import Predictor
 
 class ProblemClass:
   DEDUCTIVE = 0
-  POSESSIVE = 1
+  POSSESSIVE = 1
   DEDUCTIVE_SET = set({'eat'})
-  POSESSIVE_SET = set({'have', 'be'})
+  POSSESSIVE_SET = set({'have', 'be'})
 
   @staticmethod
   def getName(enum):
     definition = {
       ProblemClass.DEDUCTIVE : 'DEDUCTIVE',
-      ProblemClass.POSESSIVE : 'POSESSIVE'
+      ProblemClass.POSSESSIVE : 'POSSESSIVE'
     }
     return definition.get(enum, "Invalid numbner")
 
@@ -37,8 +37,8 @@ class MSCorpus:
   def getProblemClass(self,verb):
     if(verb in ProblemClass.DEDUCTIVE_SET):
       return ProblemClass.DEDUCTIVE
-    if(verb in ProblemClass.POSESSIVE_SET):
-      return ProblemClass.POSESSIVE
+    if(verb in ProblemClass.POSSESSIVE_SET):
+      return ProblemClass.POSSESSIVE
     raise ValueError(f"verb:{verb} is not belong to any ProblemClass")
 
 # msc = MSCorpus.getInstance()
