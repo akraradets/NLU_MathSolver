@@ -31,8 +31,8 @@ class WordProcessor:
     self.logger.debug(f"verb:{verb}|lemma:{lemma}|class:{classids}")
     return classids
 
-  def getLemma(self,verb):
-    lemma = self.lemmatizer.lemmatize(verb,'v')
+  def getLemma(self,word,pos='v'):
+    lemma = self.lemmatizer.lemmatize(word,pos)
     return lemma
 
 
