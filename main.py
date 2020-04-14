@@ -28,7 +28,7 @@ class Main:
     equation = ""
     # question = "Sam has 5 apples. Sam eats 3 apples. How many apples does Sam have?"
     # question = "Sam has 5 apples. Sam eats 3 apples. How many apples does Sam have left?"
-    question = "Sam has 5 apples. Sam eats 3 apples. Sam consumes 10 more apples. How many apples does Sam eat?"
+    question = "Sam has 5 apples. Sam eats 3 apples. Mark consumes 10 more apples. How many apples does Sam drink?"
     # question = "Sam has 5 apples. Sam eats 3 apples.  Sam eats 10 more apples. How many apples does Sam eat?"
     # question = "Sam has 5 apples. Sam eats 3 apples. How many apples are in Sam's Stomach?"
     # question = "Sam has 5 apples. Sam eats 3 apples. How many apples are with Sam?"
