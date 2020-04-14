@@ -2,7 +2,7 @@ from systems.LoggerFactory import LoggerFactory
 import nltk
 from nltk.corpus import wordnet as wn
 from nltk.stem.wordnet import WordNetLemmatizer
-
+from MSCorpus import ProblemClass
 
 class WordProcessor:
   __instance = None
@@ -38,6 +38,7 @@ class WordProcessor:
   def isSimilar(self,lemma1,lemma2,pos = None):
     max_score, min_score, avg_score = self.calSimilarity(lemma1, lemma2, pos)
     if(max_score == 1):
+      ProblemClass.updateKnowledge(lemma1,lemma2)
       return True
     else:
       return False
