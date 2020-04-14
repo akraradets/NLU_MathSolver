@@ -25,9 +25,11 @@ class Main:
     msc = MSCorpus.getInstance()
     self.logger.debug('Run question')
 
+    equation = ""
     # question = "Sam has 5 apples. Sam eats 3 apples. How many apples does Sam have?"
     # question = "Sam has 5 apples. Sam eats 3 apples. How many apples does Sam have left?"
-    question = "Sam has 5 apples. Sam eats 3 apples. How many apples does Sam eat?"
+    question = "Sam has 5 apples. Sam eats 3 apples.  Sam eats 10 more apples. How many apples does Sam eat?"
+    # question = "Sam has 5 apples. Sam eats 3 apples.  Sam eats 10 more apples. How many apples does Sam eat?"
     # question = "Sam has 5 apples. Sam eats 3 apples. How many apples are in Sam's Stomach?"
     # question = "Sam has 5 apples. Sam eats 3 apples. How many apples are with Sam?"
     """ 
@@ -71,22 +73,24 @@ class Main:
     self.logger.debug(f"verbs:{verbs}")
     self.logger.debug(f"SRL-Dump:{srl.results}")
 
-    verb = verbs[0]
+    target_verb = verbs[0]
     # 2.3 Use both information to identify problem class.
-    lemma = wp.getLemma(verb)
-    self.logger.debug(f"TargetVerb:{verb}|Lemma:{lemma}")
-    detectedClass = msc.getProblemClass(lemma)
+    target_lemma = wp.getLemma(target_verb)
+    self.logger.debug(f"TargetVerb:{target_verb}|Lemma:{target_lemma}")
+    detectedClass = msc.getProblemClass(target_lemma)
     self.logger.debug(f"ProblemClass:{ProblemClass.getName(detectedClass)}")
 
     # 3. Process each statements according to the problem class.  
-    statements = sentences[wh_sentences.index(False)]
+    statements = [sentences[index] for index, isWh in enumerate(wh_sentences) if isWh == False]
+    self.logger.debug(f"Statements:{statements}")
+
     if(detectedClass == ProblemClass.DEDUCTIVE):
       # extract target_actor and target_entity from question
       # [usually] actor is tag with ARG0
-      target_actor = srl.getRole(role="ARG0",verb=verb)
+      target_actor = srl.getRole(role="ARG0",verb=target_verb)
       self.logger.debug(f"Actor:{target_actor}")
       # [usually] entity is tag with ARG1 but we have to remove "How many" from the sentences
-      target_entity = srl.getRole(role="ARG1",verb=verb)
+      target_entity = srl.getRole(role="ARG1",verb=target_verb)
       self.logger.debug(f"Entity:{target_entity}")
 
       if(target_entity[0].lower() == 'how'):
@@ -99,7 +103,52 @@ class Main:
         target_entity[index] = wp.getLemma(target_entity[index],'n')
 
       self.logger.debug(f"Entity-clean:{target_entity}")
+      
+      # Process eact statements
+      for index, statement in enumerate(statements):
+        self.logger.debug(f"Statement-{index}|statement:{statement}")
+        verbs = srl.parse(statement)
+        self.logger.debug(f"Statement-{index}|verb:{verbs}")
+        verb = verbs[0]
+        lemma = wp.getLemma(verb)
+        actor = srl.getRole("ARG0",verb)
+        entity = srl.getRole("ARG1",verb)
 
+        # Take 'more' away
+        hasMore = False
+        if('more' in entity):
+          hasMore = True
+          entity.pop(entity.index('more'))
+
+        # Construct an entity string for POS
+        entityStr = ""
+        for word in entity:
+          entityStr = f"{entityStr} {word}"
+        self.logger.debug(f"Statement-{index}|entityStr:{entityStr}")
+        # extract number from entity
+        pos = cParser.parse(entityStr)
+        self.logger.debug(f"Statement-{index}|entityStr_pos:{pos}")
+        number = None
+        if('CD' in pos):
+          number = entity.pop(pos.index('CD'))
+        # Lemmatize
+        for i in range(len(entity)):
+          entity[i] = wp.getLemma(entity[i],'n')
+        
+        # Same deduction action
+        self.logger.debug(f"Statement-{index}|lemma:{lemma}|actor:{actor}|entity:{entity}|number:{number}")
+        if(lemma == target_lemma and actor == target_actor and entity == target_entity):
+          self.logger.debug(f"Statement-{index}| a concerned phrases")
+          if(equation == ""):
+            equation = number
+          else:
+            equation = f"{equation} + {number}"
+        else:
+          # Probably not relate to our concern
+          self.logger.debug(f"Statement-{index}| XXXX not a concerned phrases XXXX")
+          pass
+
+        print(equation)
 
     elif(detectedClass == ProblemClass.POSESSIVE):
       pass
