@@ -1,12 +1,12 @@
 from systems.LoggerFactory import LoggerFactory
 from allennlp.predictors.predictor import Predictor
-# import pickle
 import yaml
 import io
 
 class ProblemClass:
   DIR_KB = "knowledgebase/"
-  FILE_DEDUCTIVE = "deductive"
+  FILE_DEDUCTIVE = "deductive.yml"
+  FILE_POSSESSIVE = "possessive.yml"
 
   DEDUCTIVE = 0
   POSSESSIVE = 1
@@ -23,18 +23,32 @@ class ProblemClass:
 
   @staticmethod
   def saveKnowledge():
-    d_name = ProblemClass.DIR_KB + ProblemClass.FILE_DEDUCTIVE
-    with io.open(d_name, 'w', encoding='utf8') as outfile:
+    deductive = ProblemClass.DIR_KB + ProblemClass.FILE_DEDUCTIVE
+    with io.open(deductive, 'w', encoding='utf8') as outfile:
       yaml.dump(sorted(ProblemClass.DEDUCTIVE_SET), outfile, default_flow_style=False, allow_unicode=True)
-    # pickle.dump(ProblemClass.DEDUCTIVE_SET, open( ProblemClass.DIR_KB + ProblemClass.FILE_DEDUCTIVE, 'wb' ) )
+
+    possessive = ProblemClass.DIR_KB + ProblemClass.FILE_POSSESSIVE
+    with io.open(possessive, 'w', encoding='utf8') as outfile:
+      yaml.dump(sorted(ProblemClass.POSSESSIVE_SET), outfile, default_flow_style=False, allow_unicode=True)
+
+
 
   @staticmethod
   def loadKnowledge():
-    d_name = ProblemClass.DIR_KB + ProblemClass.FILE_DEDUCTIVE
-    with open(d_name, 'r') as stream:
-      ProblemClass.DEDUCTIVE_SET = set(yaml.safe_load(stream))
-    # ProblemClass.DEDUCTIVE_SET = pickle.load( open( ProblemClass.DIR_KB + ProblemClass.FILE_DEDUCTIVE, 'rb' ) )
+    logger = LoggerFactory(ProblemClass).getLogger()
+    try:
+      deductive = ProblemClass.DIR_KB + ProblemClass.FILE_DEDUCTIVE
+      with open(deductive, 'r') as stream:
+        ProblemClass.DEDUCTIVE_SET = set(yaml.safe_load(stream))
+    except:
+      logger.debug(f"Cannot open file {deductive}. Use default set value")
 
+    try:
+      possessive = ProblemClass.DIR_KB + ProblemClass.FILE_POSSESSIVE
+      with open(possessive, 'r') as stream:
+        ProblemClass.POSSESSIVE_SET = set(yaml.safe_load(stream))
+    except:
+      logger.debug(f"Cannot open file {possessive}. Use default set value")
 
 
 class MSCorpus:
@@ -60,9 +74,9 @@ class MSCorpus:
       return ProblemClass.POSSESSIVE
     raise ValueError(f"verb:{verb} is not belong to any ProblemClass")
 
-ProblemClass.loadKnowledge()
-print(ProblemClass.DEDUCTIVE_SET)
-ProblemClass.DEDUCTIVE_SET.add('consume')
-ProblemClass.saveKnowledge()
+# ProblemClass.loadKnowledge()
+# print(ProblemClass.DEDUCTIVE_SET)
+# ProblemClass.DEDUCTIVE_SET.add('consume')
+# ProblemClass.saveKnowledge()
 # msc = MSCorpus.getInstance()
 # print(msc.getProblemClass('eat'))
