@@ -38,7 +38,7 @@ class WordProcessor:
   def isSimilar(self,lemma1,lemma2,pos = None):
     max_score, min_score, avg_score = self.calSimilarity(lemma1, lemma2, pos)
     if(max_score == 1):
-      ProblemClass.updateKnowledge(lemma1,lemma2)
+      # ProblemClass.updateKnowledge(lemma1,lemma2)
       return True
     else:
       return False
@@ -52,6 +52,8 @@ class WordProcessor:
       for l2 in wn.lemmas(lemma2,pos):
         count = count + 1
         score = l1.synset().path_similarity(l2.synset())
+        if(score == 1):
+          self.logger.info(f"{l1}:{l2} is match")
         max_score = max(max_score,score)
         min_score = min(min_score,score)
         avg_score = avg_score + score
