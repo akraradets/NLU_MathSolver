@@ -22,7 +22,8 @@ class ProblemClass:
   SET_DEDUCTIVE = set({'eat'})
   SET_POSSESSIVE = set({'have', 'be'})
 
-  SET_EATABLE = [set({'breakfast'})]
+  SET_MEAL = set({'breakfast'})
+  SET_EATABLE = set({'apple'})
 
   @staticmethod
   def getName(enum):

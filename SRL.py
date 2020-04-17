@@ -18,7 +18,7 @@ class SRL:
         self.predictor = Predictor.from_path("libs/allennlp-SRL.tar.gz")
         SRL.__instance = self
 
-  def parse(self, sentence, withAux = False):
+  def parse(self, sentence):
     # reset results
     self.results = None
     results = self.predictor.predict(
@@ -29,6 +29,7 @@ class SRL:
 
     words = results['words']
     verbs = []
+    verbs_aux = []
     tags = {}
     roles = {}
 
@@ -39,8 +40,8 @@ class SRL:
       if len(target['tags']) == target['tags'].count('O') + 1:
         isAux = True
       
-      if isAux and withAux == False:
-        continue
+      # if isAux and withAux == False:
+      #   continue
 
       for word, tag in zip(words, target['tags']):
         suffix = ''
@@ -55,17 +56,20 @@ class SRL:
         tagged_words.append(tag)
         roles_set.add(role)
 
-      verbs.append(target['verb'])
+      if(isAux == False):
+        verbs.append(target['verb'])
+      verbs_aux.append(target['verb'])
       tags[target['verb']] = tagged_words
       roles[target['verb']] = roles_set
 
     self.words = words
     self.verbs = verbs
+    self.verbs_aux = verbs_aux
     self.tags = tags
     self.roles = roles
 
     return self.verbs
-  
+
   def getRoleSet(self, verb):
     role_set = []
     try:
@@ -93,11 +97,50 @@ class SRL:
         output.append(tagged_word['word'])
 
     return output
-    # return 'e'
 
-# srl = SRL.getInstance()
-# verbs = srl.parse("Did Uriah honestly think he could beat The Legend of Zelda in under three hours?")
-# print(verbs)
+# sent = "How many apples did Sam have?"
+sent = "How many apples did Sam have this breakfast?"
+# sent = "How many apples does Sam have left?"
+
+from ConParser import ConParser
+cParser = ConParser.getInstance()
+pos = cParser.parse(sent)
+print(cParser.words)
+print(pos)
+
+srl = SRL.getInstance()
+verbs = srl.parse(sent)
+print(srl.verbs_aux)
+print(srl.tags['have'])
+# print(srl.results)
+# print(srl.getRole('have'))
+
+
+# It coexists with an eatable object.
+# The sentence is not in the present simple tense.
+# If the sentence is the present simple tense, It must have an adverb of frequency.
+# It is the answer to the previous sentence that met the conditions.
+
+list_do = ['do','does','did']
+list_have = ['have', 'has', 'had']
+list_label_verb = ['VB','VBD','VBG','VBN','VBP','VBZ']
+if(set(list_do).isdisjoint(set(srl.verbs_aux)) == False):
+  print('contains do did does')
+if(set(list_have).isdisjoint(set(srl.verbs_aux)) == False):
+  print('contains has have had')
+  # if have is real verb or an aux?
+  have = set(list_have).intersection(set(srl.verbs_aux)).pop()
+  print(have)
+  index = cParser.words.index(have)
+  if(pos[index + 1] in list_label_verb):
+    print("Have is an aux")
+    real_verb = cParser.words[index + 1]
+  else:
+    print("Have is not an aux")
+    real_verb = have
+
+print(real_verb)
+
 # print("== Role ==")
 # print(srl.getRoleSet('think'))
 # print("==== think ====")

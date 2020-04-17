@@ -1,5 +1,6 @@
 from systems.LoggerFactory import LoggerFactory
 from allennlp.predictors.predictor import Predictor
+from nltk.tokenize import word_tokenize
 
 class ConParser:
   __instance = None
@@ -33,7 +34,34 @@ class ConParser:
     self.words = results['tokens']
     return self.labels
 
+  def getPhrase(self, word='have', phraseType='VP'):
+    if(word not in self.words):
+      raise ValueError(f"Word:{word} is not in '{self.words}'")
+    root = self.results['hierplane_tree']['root']
+    if(root['nodeType'] == phraseType and word == word_tokenize(root['word'])[0] ):
+      return root
+    child_list = root['children']
+    # count = 0
+    for node in child_list:
+      # print(f"===== {count} =====")
+      # print(type(node))
+      # print(node)      
+      if('children' in node.keys()):
+        child_list.extend(node['children'])
+      # count = count + 1
+      if(node['nodeType'] == phraseType and word == word_tokenize(node['word'])[0] ):
+        return node
+
+# sent = "How many apples did Sam have?"
+# sent = "How many apples did Sam have this breakfast?"
+# sent = "How many apples does Sam have left?"
+
 # cParser = ConParser.getInstance()
+# pos = cParser.parse(sent)
+# print(cParser.words)
+# print(pos)
+# print(cParser.getPhrase('have'))
+
 # pos = cParser.parse("How many apples does Sam eat?")
 # words = cParser.words
 # for w,p in zip(words,pos):

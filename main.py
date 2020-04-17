@@ -37,9 +37,10 @@ class Main:
     """ 
     1. Split the string into sentences.
     2. Usually, the last sentence is the query statement. Use that to identify problem class.
-      2.1 Check the type of question (What, Where, When, Why, How).
-      2.2 Extract verb.
-      2.3 Use both information to identify problem class.
+      2.a Check the type of question (What, Where, When, Why, How).
+      2.a-1 Deciding have
+      2.b Extract verb.
+      2.c Use both information to identify problem class.
     3. Process each sentence according to the problem class.     
     """
 
@@ -67,16 +68,17 @@ class Main:
 
     queryStatement = sentences[wh_sentences.index(True)]
     self.logger.debug(f"queryStatement:{queryStatement}")
-    # 2.1 Check the type of question (What, Where, When, Why, How).
+    # 2.a Check the type of question (What, Where, When, Why, How).
     pass
 
-    # 2.2 Extract verb.
+    # 2.b Extract verb.
     verbs = srl.parse(queryStatement)
+    verbs_aux = srl.verbs_aux
     self.logger.debug(f"verbs:{verbs}")
     self.logger.debug(f"SRL-Dump:{srl.results}")
 
     target_verb = verbs[0]
-    # 2.3 Use both information to identify problem class.
+    # 2.c Use both information to identify problem class.
     target_lemma = wp.getLemma(target_verb)
     self.logger.debug(f"TargetVerb:{target_verb}|Lemma:{target_lemma}")
     detectedClass = msc.getProblemClass(target_lemma)
