@@ -142,7 +142,7 @@ class MSCorpus:
       return ProblemClass.POSSESSIVE
     raise ValueError(f"verb:{verb} is not belong to any ProblemClass")
 
-ProblemClass.loadKnowledge(rollback=False)
+# ProblemClass.loadKnowledge(rollback=False)
 # print(ProblemClass.DEDUCTIVE_SET)
 # ProblemClass.DEDUCTIVE_SET.add('consume')
 # ProblemClass.saveKnowledge()

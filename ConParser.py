@@ -61,12 +61,13 @@ class ConParser:
 
   def extractNounPhrase_WhPhrase(self,phrase):
     pos = self.parse(phrase,save=False)
+    # words = phrase
     words = word_tokenize(phrase)
     count = 0
     nounPhrase = []
     for w,p in zip(words,pos):
       count = count + 1
-      print(count, w, p)
+      # print(count, w, p)
       # if the first word is not How, we abort mission
       if(count == 1):
         if(w.lower() == "how"):
@@ -80,9 +81,9 @@ class ConParser:
         
       nounPhrase.append(w)
       if(p in ConParser.SET_LABEL_NOUN):
-        self.noun = w
+        self.extract_noun = w
 
-    self.logger.debug(f"Extract NounPhrase:{nounPhrase} Noun:{self.noun} from WhPhrase:{phrase}")
+    self.logger.debug(f"Extract NounPhrase:{nounPhrase} Noun:{self.extract_noun} from WhPhrase:{phrase}")
     return nounPhrase
 
 # sent = "How many apples did Sam have?"

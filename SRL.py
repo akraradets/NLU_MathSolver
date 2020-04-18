@@ -74,28 +74,32 @@ class SRL:
 
   def getRealVerb(self,pos):
     verbs_aux = set(self.verbs_aux)
-    self.have_do = False
-    self.have_have = False
+    obj = {"isExist": False, "word": None, "index":None, "pos":None}
+    self.obj_do = obj.copy()
+    self.obj_have = obj.copy()
 
     set_do = ProblemClass.SET_DO
     set_have = ProblemClass.SET_HAVE
     set_label_verb = ConParser.SET_LABEL_VERB
     words = self.words
+
     if(set_do.isdisjoint(verbs_aux) == False):
-      self.do = set_do.intersection(verbs_aux).pop()
-      self.have_do = True
-      self.logger.debug(f"Found do:{self.do}")
+      self.obj_do["word"] = set_do.intersection(verbs_aux).pop()
+      self.obj_do["isExist"] = True
+      self.obj_do["index"] = words.index(self.obj_do["word"])
+      self.obj_do["pos"] = pos[self.obj_do["index"]]
+      self.logger.debug(f"Found do:{self.obj_do}")
     if(set_have.isdisjoint(verbs_aux) == False):
       # if have is real verb or an aux?
-      have = set_have.intersection(verbs_aux).pop()
-      self.have_have = True
-      self.have = have
-      self.logger.debug(f"Found have:{have}")
-      index = words.index(have)
-      if(pos[index + 1] in set_label_verb):
-        real_verb = words[index + 1]
+      self.obj_have["word"] = set_have.intersection(verbs_aux).pop()
+      self.obj_have["isExist"] = True
+      self.obj_have["index"] = words.index(self.obj_have["word"])
+      self.obj_have["pos"] = pos[self.obj_have["index"]]
+      self.logger.debug(f"Found have:{self.obj_have}")
+      if(pos[self.obj_have["index"] + 1] in set_label_verb):
+        real_verb = words[self.obj_have["index"] + 1]
       else:
-        real_verb = have
+        real_verb = self.obj_have["word"]
       self.logger.debug(f"Found real_verb:{real_verb}")
     return real_verb
 

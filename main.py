@@ -28,8 +28,8 @@ class Main:
     self.logger.debug('Run question')
 
     equation = ""
-    # question = "Sam has 5 apples. Sam eats 3 apples. How many apples does Sam have?"
-    question = "Sam has 5 apples. Sam eats 3 apples. How many apples does Sam have left?"
+    question = "Sam has 5 apples. Sam eats 3 apples. How many apples did Sam have?"
+    # question = "Sam has 5 apples. Sam eats 3 apples. How many apples does Sam have left?"
     # question = "Sam has 5 apples. Sam eats 3 apples. Mark consumes 10 more apples. How many apples does Sam consume?"
     # question = "Sam has 5 apples. Sam eats 3 apples.  Sam eats 10 more apples. How many apples does Sam eat?"
     # question = "Sam has 5 apples. Sam eats 3 apples. How many apples are in Sam's Stomach?"
@@ -91,11 +91,38 @@ class Main:
       """
       # Condition 1: It coexists with an eatable object.
       # Extract ARG1
-      arg1 = srl.getRole('ARG1',target_verb)
-      if(target_entity[0].lower() == 'how'):
-        target_entity.pop(0)
-        if(target_entity[0].lower() == 'many'):
-          target_entity.pop(0)
+      arg1_phrase = srl.getRole('ARG1',target_verb)
+      arg1_phrase_str = ""
+      for w in arg1_phrase:
+        arg1_phrase_str = f"{arg1_phrase_str}{w} " 
+      arg1 = cParser.extractNounPhrase_WhPhrase(arg1_phrase_str)
+      mainEntity = wp.getLemma(cParser.extract_noun,'n')
+      self.logger.debug(f"Entity:{mainEntity}")
+      isEatable = False
+      if(mainEntity in ProblemClass.SET_EATABLE):
+        isEatable = True
+        # Condition 2: The sentence is not in the present simple tense. 
+        if((srl.obj_do["isExist"] and srl.obj_do["pos"] in ["VB","VBZ"]) 
+        or (srl.obj_do["isExist"] == False and srl.obj_have["isExist"] and srl.obj_have["pos"] in ["VB","VBZ"])):
+          # It is present simple tense
+          # print(srl.obj_do["isExist"])
+          # print(srl.obj_do["pos"] in ["VB","VBZ"])
+          # print(srl.obj_do["pos"])
+          # print(["VB","VBZ"])
+          # print("VBD" in ["VB","VBZ"])
+          # print(srl.obj_do["isExist"] == False)
+          # print(srl.obj_have["isExist"])
+          # print(srl.obj_have["pos"] in ["VB","VBZ"])
+          self.logger.debug(f"It is present simple tense")
+        else:
+          # It is not a present simple tense
+          self.logger.debug(f"Override target_verb:'{target_verb}' to 'eat'")
+          target_verb = "eat"
+
+      else:
+        self.logger.debug(f"Entity:{mainEntity} is not eatable -> EatableSET:{ProblemClass.SET_EATABLE}")
+
+
 
     # 2.c Use both information to identify problem class.
     target_lemma = wp.getLemma(target_verb)

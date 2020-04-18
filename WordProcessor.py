@@ -65,4 +65,4 @@ class WordProcessor:
 # print(wp.isSimilar('eat','consume','v'))
 # wp.getClass('left')
 # wp.getClass('are')
-# wp.getLemma('are')
+# print(wp.getLemma('apples','n'))
