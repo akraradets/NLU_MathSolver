@@ -1,5 +1,7 @@
 from systems.LoggerFactory import LoggerFactory
 from allennlp.predictors.predictor import Predictor
+from ConParser import ConParser
+from MSCorpus import ProblemClass
 
 class SRL:
   __instance = None
@@ -70,6 +72,33 @@ class SRL:
 
     return self.verbs
 
+  def getRealVerb(self,pos):
+    verbs_aux = set(self.verbs_aux)
+    self.have_do = False
+    self.have_have = False
+
+    set_do = ProblemClass.SET_DO
+    set_have = ProblemClass.SET_HAVE
+    set_label_verb = ConParser.SET_LABEL_VERB
+    words = self.words
+    if(set_do.isdisjoint(verbs_aux) == False):
+      self.do = set_do.intersection(verbs_aux).pop()
+      self.have_do = True
+      self.logger.debug(f"Found do:{self.do}")
+    if(set_have.isdisjoint(verbs_aux) == False):
+      # if have is real verb or an aux?
+      have = set_have.intersection(verbs_aux).pop()
+      self.have_have = True
+      self.have = have
+      self.logger.debug(f"Found have:{have}")
+      index = words.index(have)
+      if(pos[index + 1] in set_label_verb):
+        real_verb = words[index + 1]
+      else:
+        real_verb = have
+      self.logger.debug(f"Found real_verb:{real_verb}")
+    return real_verb
+
   def getRoleSet(self, verb):
     role_set = []
     try:
@@ -97,49 +126,6 @@ class SRL:
         output.append(tagged_word['word'])
 
     return output
-
-# sent = "How many apples did Sam have?"
-sent = "How many apples did Sam have this breakfast?"
-# sent = "How many apples does Sam have left?"
-
-from ConParser import ConParser
-cParser = ConParser.getInstance()
-pos = cParser.parse(sent)
-print(cParser.words)
-print(pos)
-
-srl = SRL.getInstance()
-verbs = srl.parse(sent)
-print(srl.verbs_aux)
-print(srl.tags['have'])
-# print(srl.results)
-# print(srl.getRole('have'))
-
-
-# It coexists with an eatable object.
-# The sentence is not in the present simple tense.
-# If the sentence is the present simple tense, It must have an adverb of frequency.
-# It is the answer to the previous sentence that met the conditions.
-
-list_do = ['do','does','did']
-list_have = ['have', 'has', 'had']
-list_label_verb = ['VB','VBD','VBG','VBN','VBP','VBZ']
-if(set(list_do).isdisjoint(set(srl.verbs_aux)) == False):
-  print('contains do did does')
-if(set(list_have).isdisjoint(set(srl.verbs_aux)) == False):
-  print('contains has have had')
-  # if have is real verb or an aux?
-  have = set(list_have).intersection(set(srl.verbs_aux)).pop()
-  print(have)
-  index = cParser.words.index(have)
-  if(pos[index + 1] in list_label_verb):
-    print("Have is an aux")
-    real_verb = cParser.words[index + 1]
-  else:
-    print("Have is not an aux")
-    real_verb = have
-
-print(real_verb)
 
 # print("== Role ==")
 # print(srl.getRoleSet('think'))

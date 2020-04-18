@@ -29,8 +29,8 @@ class Main:
 
     equation = ""
     # question = "Sam has 5 apples. Sam eats 3 apples. How many apples does Sam have?"
-    # question = "Sam has 5 apples. Sam eats 3 apples. How many apples does Sam have left?"
-    question = "Sam has 5 apples. Sam eats 3 apples. Mark consumes 10 more apples. How many apples does Sam consume?"
+    question = "Sam has 5 apples. Sam eats 3 apples. How many apples does Sam have left?"
+    # question = "Sam has 5 apples. Sam eats 3 apples. Mark consumes 10 more apples. How many apples does Sam consume?"
     # question = "Sam has 5 apples. Sam eats 3 apples.  Sam eats 10 more apples. How many apples does Sam eat?"
     # question = "Sam has 5 apples. Sam eats 3 apples. How many apples are in Sam's Stomach?"
     # question = "Sam has 5 apples. Sam eats 3 apples. How many apples are with Sam?"
@@ -67,6 +67,7 @@ class Main:
     # >>> [False, False, True]
 
     queryStatement = sentences[wh_sentences.index(True)]
+    pos_queryStatement = pos_sentences[wh_sentences.index(True)]
     self.logger.debug(f"queryStatement:{queryStatement}")
     # 2.a Check the type of question (What, Where, When, Why, How).
     pass
@@ -74,10 +75,28 @@ class Main:
     # 2.b Extract verb.
     verbs = srl.parse(queryStatement)
     verbs_aux = srl.verbs_aux
+    
     self.logger.debug(f"verbs:{verbs}")
     self.logger.debug(f"SRL-Dump:{srl.results}")
 
-    target_verb = verbs[0]
+    target_verb = srl.getRealVerb(pos_queryStatement)
+
+    if(target_verb in ProblemClass.SET_HAVE):
+      """ If the targert verb is 'have', it has to perform 'have' deciding (whether it means 'eat' or 'own') base on the following conditions
+      Condition 1: It coexists with an eatable object.
+      Condition 2: The sentence is not in the present simple tense. 
+      Condition 3: If the sentence is the present simple tense, It must have an adverb of frequency.
+      Condition 4: It is the answer to the previous sentence that met the conditions.
+      We will implement only the first 2 conditions.
+      """
+      # Condition 1: It coexists with an eatable object.
+      # Extract ARG1
+      arg1 = srl.getRole('ARG1',target_verb)
+      if(target_entity[0].lower() == 'how'):
+        target_entity.pop(0)
+        if(target_entity[0].lower() == 'many'):
+          target_entity.pop(0)
+
     # 2.c Use both information to identify problem class.
     target_lemma = wp.getLemma(target_verb)
     self.logger.debug(f"TargetVerb:{target_verb}|Lemma:{target_lemma}")

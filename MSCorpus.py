@@ -25,6 +25,9 @@ class ProblemClass:
   SET_MEAL = set({'breakfast'})
   SET_EATABLE = set({'apple'})
 
+  SET_DO = set({'do','does','did'})
+  SET_HAVE = set({'have', 'has', 'had'})
+
   @staticmethod
   def getName(enum):
     return ProblemClass.LIST_SET.get(enum, "Invalid numbner")
