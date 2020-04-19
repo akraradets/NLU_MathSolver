@@ -8,6 +8,8 @@ from SRL import SRL
 from ConParser import ConParser
 from WordProcessor import WordProcessor
 from MSCorpus import MSCorpus, ProblemClass
+from Solver import DeductiveSolver
+
 
 class Main:
   def __init__(self):
@@ -122,8 +124,6 @@ class Main:
       else:
         self.logger.debug(f"Entity:{mainEntity} is not eatable -> EatableSET:{ProblemClass.SET_EATABLE}")
 
-
-
     # 2.c Use both information to identify problem class.
     target_lemma = wp.getLemma(target_verb)
     self.logger.debug(f"TargetVerb:{target_verb}|Lemma:{target_lemma}")
@@ -132,6 +132,7 @@ class Main:
 
     # 3. Process each statements according to the problem class.  
     statements = [sentences[index] for index, isWh in enumerate(wh_sentences) if isWh == False]
+    pos_statements = [pos_sentences[index] for index, isWh in enumerate(wh_sentences) if isWh == False]
     self.logger.debug(f"Statements:{statements}")
 
     # """ ============== DEDUCTIVE ============== """
@@ -148,6 +149,9 @@ class Main:
         target_entity.pop(0)
         if(target_entity[0].lower() == 'many'):
           target_entity.pop(0)
+
+      solver = DeductiveSolver()
+      solver.tag(actor=target_actor, entity=target_entity, verb=target_lemma, statements=statements, pos_statements=pos_statements)
 
       # Lemmatize
       for index in range(len(target_entity)):
