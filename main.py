@@ -14,26 +14,32 @@ from Solver import DeductiveSolver
 class Main:
   def __init__(self):
     self.logger = LoggerFactory(self).getLogger()
-
-  def run(self):
-    self.logger.debug('Starting...')
     self.logger.debug('Init ConParser')
-    cParser = ConParser.getInstance()
+    self.cParser = ConParser.getInstance()
     self.logger.debug('Init SRL')
-    srl = SRL.getInstance()
+    self.srl = SRL.getInstance()
     self.logger.debug('Init WordProcessor')
-    wp = WordProcessor.getInstance()
+    self.wp = WordProcessor.getInstance()
     self.logger.debug('Init MSCorpus')
-    msc = MSCorpus.getInstance()
+    self.msc = MSCorpus.getInstance()
     self.logger.debug('Load KnowledgeBase')
     ProblemClass.loadKnowledge(rollback=False)
+
+
+  def run(self):
+    cParser = self.cParser 
+    srl = self.srl
+    wp = self.wp
+    msc = self.msc
+
+    self.logger.debug('Starting...')
     self.logger.debug('Run question')
 
     equation = ""
     question = "Sam has 5 apples. Sam eats 3 apples. How many apples did Sam have?"
     # question = "Sam has 5 apples. Sam eats 3 apples. How many apples does Sam have left?"
     # question = "Sam has 5 apples. Sam eats 3 apples. Mark consumes 10 more apples. How many apples does Sam consume?"
-    # question = "Sam has 5 apples. Sam eats 3 apples.  Sam eats 10 more apples. How many apples does Sam eat?"
+    # question = "Sam has 5 apples. Sam eats 3 apples. Sam eats 10 more apples. How many apples does Sam eat?"
     # question = "Sam has 5 apples. Sam eats 3 apples. How many apples are in Sam's Stomach?"
     # question = "Sam has 5 apples. Sam eats 3 apples. How many apples are with Sam?"
     """ 
@@ -119,7 +125,21 @@ class Main:
         else:
           # It is not a present simple tense
           self.logger.debug(f"Override target_verb:'{target_verb}' to 'eat'")
-          target_verb = "eat"
+          queryStatement_new = ""
+          for w in srl.words:
+            print(w, srl.obj_have["word"])
+            if(w == srl.obj_have["word"]):
+              w = "eat"
+            queryStatement_new = f"{queryStatement_new}{w} "
+          print(queryStatement_new)
+          verbs = srl.parse(queryStatement_new)
+          verbs_aux = srl.verbs_aux
+          
+          self.logger.debug(f"verbs:{verbs}")
+          self.logger.debug(f"SRL-Dump:{srl.results}")
+
+          target_verb = srl.getRealVerb(pos_queryStatement)
+          # target_verb = "eat"
 
       else:
         self.logger.debug(f"Entity:{mainEntity} is not eatable -> EatableSET:{ProblemClass.SET_EATABLE}")
@@ -151,60 +171,60 @@ class Main:
           target_entity.pop(0)
 
       solver = DeductiveSolver()
-      solver.tag(actor=target_actor, entity=target_entity, verb=target_lemma, statements=statements, pos_statements=pos_statements)
+      solver.tag(actor=target_actor, entity=target_entity, lemma=target_lemma, statements=statements, pos_statements=pos_statements)
 
-      # Lemmatize
-      for index in range(len(target_entity)):
-        target_entity[index] = wp.getLemma(target_entity[index],'n')
+      # # Lemmatize
+      # for index in range(len(target_entity)):
+      #   target_entity[index] = wp.getLemma(target_entity[index],'n')
 
-      self.logger.debug(f"Entity-clean:{target_entity}")
+      # self.logger.debug(f"Entity-clean:{target_entity}")
       
-      # Process eact statements
-      for index, statement in enumerate(statements):
-        self.logger.debug(f"Statement-{index}|statement:{statement}")
-        verbs = srl.parse(statement)
-        self.logger.debug(f"Statement-{index}|verb:{verbs}")
-        verb = verbs[0]
-        lemma = wp.getLemma(verb)
-        actor = srl.getRole("ARG0",verb)
-        entity = srl.getRole("ARG1",verb)
+      # # Process eact statements
+      # for index, statement in enumerate(statements):
+      #   self.logger.debug(f"Statement-{index}|statement:{statement}")
+      #   verbs = srl.parse(statement)
+      #   self.logger.debug(f"Statement-{index}|verb:{verbs}")
+      #   verb = verbs[0]
+      #   lemma = wp.getLemma(verb)
+      #   actor = srl.getRole("ARG0",verb)
+      #   entity = srl.getRole("ARG1",verb)
 
-        # Take 'more' away
-        hasMore = False
-        if('more' in entity):
-          hasMore = True
-          entity.pop(entity.index('more'))
+      #   # Take 'more' away
+      #   hasMore = False
+      #   if('more' in entity):
+      #     hasMore = True
+      #     entity.pop(entity.index('more'))
 
-        # Construct an entity string for POS
-        entityStr = ""
-        for word in entity:
-          entityStr = f"{entityStr} {word}"
-        self.logger.debug(f"Statement-{index}|entityStr:{entityStr}")
-        # extract number from entity
-        pos = cParser.parse(entityStr)
-        self.logger.debug(f"Statement-{index}|entityStr_pos:{pos}")
-        number = None
-        if('CD' in pos):
-          number = entity.pop(pos.index('CD'))
-        # Lemmatize
-        for i in range(len(entity)):
-          entity[i] = wp.getLemma(entity[i],'n')
+      #   # Construct an entity string for POS
+      #   entityStr = ""
+      #   for word in entity:
+      #     entityStr = f"{entityStr} {word}"
+      #   self.logger.debug(f"Statement-{index}|entityStr:{entityStr}")
+      #   # extract number from entity
+      #   pos = cParser.parse(entityStr)
+      #   self.logger.debug(f"Statement-{index}|entityStr_pos:{pos}")
+      #   number = None
+      #   if('CD' in pos):
+      #     number = entity.pop(pos.index('CD'))
+      #   # Lemmatize
+      #   for i in range(len(entity)):
+      #     entity[i] = wp.getLemma(entity[i],'n')
         
-        # Same deduction action
-        self.logger.debug(f"Statement-{index}|lemma:{lemma}|actor:{actor}|entity:{entity}|number:{number}")
+      #   # Same deduction action
+      #   self.logger.debug(f"Statement-{index}|lemma:{lemma}|actor:{actor}|entity:{entity}|number:{number}")
 
-        # Calculate Similarity of lemma
-        if(wp.isSimilar(lemma, target_lemma, 'v') and actor == target_actor and entity == target_entity):
-          self.logger.debug(f"Statement-{index}|a concerned phrases")
-          if(equation == ""):
-            equation = number
-          else:
-            equation = f"{equation} + {number}"
-        else:
-          # Probably not relate to our concern
-          self.logger.debug(f"Statement-{index}|XXXX not a concerned phrases XXXX")
+      #   # Calculate Similarity of lemma
+      #   if(wp.isSimilar(lemma, target_lemma, 'v') and actor == target_actor and entity == target_entity):
+      #     self.logger.debug(f"Statement-{index}|a concerned phrases")
+      #     if(equation == ""):
+      #       equation = number
+      #     else:
+      #       equation = f"{equation} + {number}"
+      #   else:
+      #     # Probably not relate to our concern
+      #     self.logger.debug(f"Statement-{index}|XXXX not a concerned phrases XXXX")
 
-        print(equation)
+      #   print(equation)
 
     # """ ============== POSSESSIVE ============== """
     elif(detectedClass == ProblemClass.POSSESSIVE):

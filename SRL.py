@@ -77,11 +77,13 @@ class SRL:
     obj = {"isExist": False, "word": None, "index":None, "pos":None}
     self.obj_do = obj.copy()
     self.obj_have = obj.copy()
+    self.obj_real_verb = obj.copy()
 
     set_do = ProblemClass.SET_DO
     set_have = ProblemClass.SET_HAVE
     set_label_verb = ConParser.SET_LABEL_VERB
     words = self.words
+    real_verb = ""
 
     if(set_do.isdisjoint(verbs_aux) == False):
       self.obj_do["word"] = set_do.intersection(verbs_aux).pop()
@@ -100,7 +102,12 @@ class SRL:
         real_verb = words[self.obj_have["index"] + 1]
       else:
         real_verb = self.obj_have["word"]
-      self.logger.debug(f"Found real_verb:{real_verb}")
+
+    if(real_verb == ""):
+      # if have not exist, reverb is set(aux)-set_do
+      real_verb = verbs_aux.difference(set_do).pop()
+
+    self.logger.debug(f"Found real_verb:{real_verb}")
     return real_verb
 
   def getRoleSet(self, verb):

@@ -60,6 +60,7 @@ class ConParser:
         return node
 
   def extractNounPhrase_WhPhrase(self,phrase):
+    self.extract_noun = None
     pos = self.parse(phrase,save=False)
     # words = phrase
     words = word_tokenize(phrase)
