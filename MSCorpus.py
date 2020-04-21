@@ -25,7 +25,7 @@ class ProblemClass:
   SET_MEAL = set({'breakfast'})
   SET_EATABLE = set({'apple'})
 
-  SET_DO = set({'do','does','did'})
+  SET_DO = set({'do','does','did','done'})
   SET_HAVE = set({'have', 'has', 'had'})
 
   @staticmethod

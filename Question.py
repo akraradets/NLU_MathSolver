@@ -37,8 +37,16 @@ class Question:
 
 
 class Sentence:
-  STATEMENT = 0
-  QUERY = 1
+  # Tense
+  TENSE_OTHERS = 0
+  TENSE_PRESENT_SIMPLE = 1
+  LIST_TENSE = {
+    0 : 'OTHERS',
+    1 : 'PRESENT_SIMPLE'
+  }
+  # Sentence Type
+  TYPE_STATEMENT = 0
+  TYPE_QUERY = 1
   LIST_TYPE = {
       0 : 'STATEMENT',
       1 : 'QUERY'
@@ -50,7 +58,8 @@ class Sentence:
 
     self.index = index
     self.sentence = sentence
-    self.type = Sentence.STATEMENT
+    self.type = Sentence.TYPE_STATEMENT
+    self.tense = Sentence.TENSE_OTHERS
     self.verb = None
     self.ARG0 = []
     self.ARG1 = []
@@ -62,8 +71,12 @@ class Sentence:
     # With POS, we can determine if the sentence is a query
     self.__checkType()
     self.__extractVerb()
+    self.__checkTense()
     self.__parseSRL()
     self.__setSRLArgument()
+
+  def getTenseName(self,enum):
+    return Sentence.LIST_TENSE.get(enum, "Invalid numbner")
 
   def getTypeName(self,enum):
     return Sentence.LIST_TYPE.get(enum, "Invalid numbner")
@@ -138,7 +151,7 @@ class Sentence:
       if(w.SRLRole == "ARG4"): self.ARG4.append(w.index)
 
   def __extractVerb(self):
-    """ SRL Parse: Help us extract verb """
+    """ SRL Parse: Help us extract verb."""
     srl = SRLParser.getInstance()
     verbs = srl.parse(self.sentence)
     auxVerbs = srl.auxVerbs
@@ -174,9 +187,12 @@ class Sentence:
         self.verb["index"] = word.index
         self.logger.debug(f"Found real_verb:{self.verb} | word:{word}")
       else:
+        # have is real verb
         word = self.getWordBy(index=self.have["index"])
         self.verb["isExist"] = True
         self.verb["index"] = word.index
+        # reset have
+        self.have = obj.copy()
         self.logger.debug(f"Found real_verb:{self.verb} | word:{word}")
 
     # If there is no do and have, verbs will only have 1 verb.
@@ -187,12 +203,28 @@ class Sentence:
       self.verb["index"] = word.index
       self.logger.debug(f"Found real_verb:{self.verb} | word:{word}")
 
+  def __checkTense(self):
+    """ Once we extract verb. We get the information of verbs and aux in the sentence. 
+      If 'do' exist, it will be used to determine the tense of the sentence (past,present).
+    """
+    if(self.verb == None): raise ValueError(f"__extractVerb first")
+
+    pos_present = set({"VB","VBZ"})
+    # detect present simple tense
+    # print(f"========|| {}   {self.getWordBy(index=self.do["index"])}")
+    if( (self.do["isExist"] and self.getWordBy(index=self.do["index"]).pos in pos_present)
+    or (self.do["isExist"] == False and self.getVerb().pos in pos_present) ):
+      self.tense = Sentence.TENSE_PRESENT_SIMPLE
+      self.logger.debug(f"This sentence is {self.getTenseName(self.tense)}")
+      pass
+    else:
+      pass
 
   def __checkType(self):
     if(self.words is None): raise ValueError(f"__parsePOS first")
     # Check the first word if it is has a pos of WRB
     if(self.words[0].pos in ConParser.SET_LABEL_QUERY):
-      self.type = Sentence.QUERY
+      self.type = Sentence.TYPE_QUERY
 
   def __getWordsAsArray(self):
     if(self.words is None): raise ValueError(f"__parsePOS first")
@@ -208,6 +240,7 @@ class Sentence:
     obj["sentence"] = self.sentence
     obj["type"] = self.getTypeName(self.type)
     obj["verb"] = self.verb
+    obj["tense"] = self.getTenseName(self.tense)
     obj["ARG0"] = self.ARG0
     obj["ARG1"] = self.ARG1
     obj["ARG2"] = self.ARG2
