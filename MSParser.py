@@ -169,44 +169,6 @@ class SRLParser:
 
     return self.verbs
 
-  def getRealVerb(self,pos):
-    auxVerbs = set(self.auxVerbs)
-    obj = {"isExist": False, "word": None, "index":None, "pos":None}
-    self.obj_do = obj.copy()
-    self.obj_have = obj.copy()
-    self.obj_real_verb = obj.copy()
-
-    set_do = ProblemClass.SET_DO
-    set_have = ProblemClass.SET_HAVE
-    set_label_verb = ConParser.SET_LABEL_VERB
-    words = self.words
-    real_verb = ""
-
-    if(set_do.isdisjoint(auxVerbs) == False):
-      self.obj_do["word"] = set_do.intersection(auxVerbs).pop()
-      self.obj_do["isExist"] = True
-      self.obj_do["index"] = words.index(self.obj_do["word"])
-      self.obj_do["pos"] = pos[self.obj_do["index"]]
-      self.logger.debug(f"Found do:{self.obj_do}")
-    if(set_have.isdisjoint(auxVerbs) == False):
-      # if have is real verb or an aux?
-      self.obj_have["word"] = set_have.intersection(auxVerbs).pop()
-      self.obj_have["isExist"] = True
-      self.obj_have["index"] = words.index(self.obj_have["word"])
-      self.obj_have["pos"] = pos[self.obj_have["index"]]
-      self.logger.debug(f"Found have:{self.obj_have}")
-      if(pos[self.obj_have["index"] + 1] in set_label_verb):
-        real_verb = words[self.obj_have["index"] + 1]
-      else:
-        real_verb = self.obj_have["word"]
-
-    if(real_verb == ""):
-      # if have not exist, reverb is set(aux)-set_do
-      real_verb = auxVerbs.difference(set_do).pop()
-
-    self.logger.debug(f"Found real_verb:{real_verb}")
-    return real_verb
-
   def getRoleSet(self, verb):
     role_set = []
     try:

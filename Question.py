@@ -23,12 +23,11 @@ class Question:
       self.sentences.append( s )
 
     self.logger.debug(f"question:{self.sentences}")
-    print(self)
 
 
   def __repr__(self):
     return self.__str__()
-    
+
   def __str__(self):
     obj = {}
     obj["question"] = self.question
@@ -53,14 +52,26 @@ class Sentence:
     self.sentence = sentence
     self.type = Sentence.STATEMENT
     self.verb = None
+    self.ARG0 = []
+    self.ARG1 = []
+    self.ARG2 = []
+    self.ARG3 = []
+    self.ARG4 = []
+
     self.__parsePOS()
     # With POS, we can determine if the sentence is a query
     self.__checkType()
     self.__extractVerb()
     self.__parseSRL()
+    self.__setSRLArgument()
 
   def getTypeName(self,enum):
     return Sentence.LIST_TYPE.get(enum, "Invalid numbner")
+
+  def getVerb(self):
+    if(self.verb is None): raise ValueError(f"__extractVerb first")
+    index_verb = self.verb["index"]
+    return self.getWordBy(index=index_verb)
 
   def getWord(self,word):
     if(self.words is None): raise ValueError(f"__parsePOS first")
@@ -92,8 +103,39 @@ class Sentence:
     """ SRL Parse: parse it with role """
     srl = SRLParser.getInstance()
     srl.parse(self.sentence)
-    # arg1_phrase = srl.getRole('ARG1',target_verb)
-    pass
+    """ Update Tag in words """
+    verb = self.getVerb()
+    for index, (w_my, w_srl, tag_srl) in enumerate(zip(self.words, srl.words, srl.tags[verb.name])):
+      # w_my| [{"index": 0, "name": "How", "lemma": "How", "pos": "WRB"}, 
+      #         {"index": 1, "name": "many", "lemma": "many", "pos": "JJ"}, 
+      #         {"index": 2, "name": "apples", "lemma": "apple", "pos": "NNS"}, 
+      #         {"index": 3, "name": "did", "lemma": "do", "pos": "VBD"}, 
+      #         {"index": 4, "name": "Sam", "lemma": "Sam", "pos": "NNP"}, 
+      #         {"index": 5, "name": "have", "lemma": "have", "pos": "VB"}, 
+      #         {"index": 6, "name": "?", "lemma": "?", "pos": "."}]
+      # w_srl| ['How', 'many', 'apples', 'did', 'Sam', 'have', '?']
+      # tags| [{'word': 'How', 'tag': 'B-ARG1', 'suffix': 'B', 'role': 'ARG1'}, 
+      #         {'word': 'many', 'tag': 'I-ARG1', 'suffix': 'I', 'role': 'ARG1'}, 
+      #         {'word': 'apples', 'tag': 'I-ARG1', 'suffix': 'I', 'role': 'ARG1'}, 
+      #         {'word': 'did', 'tag': 'O', 'suffix': '', 'role': 'O'}, 
+      #         {'word': 'Sam', 'tag': 'B-ARG0', 'suffix': 'B', 'role': 'ARG0'}, 
+      #         {'word': 'have', 'tag': 'B-V', 'suffix': 'B', 'role': 'V'}, 
+      #         {'word': '?', 'tag': 'O', 'suffix': '', 'role': 'O'}]
+      # check if the word is the same word. Just to be safe
+      if(w_my.name != w_srl):
+        raise ValueError(f"Array differ from sentence:{self.__getWordsAsArray} and SRL:{srl.words}")
+      SRLTag = tag_srl['tag']
+      suffix = tag_srl['suffix']
+      role = tag_srl['role']
+      w_my.setSRLTag(tag=SRLTag, suffix=suffix, role=role)
+
+  def __setSRLArgument(self):
+    for w in self.words:
+      if(w.SRLRole == "ARG0"): self.ARG0.append(w.index)
+      if(w.SRLRole == "ARG1"): self.ARG1.append(w.index)
+      if(w.SRLRole == "ARG2"): self.ARG2.append(w.index)
+      if(w.SRLRole == "ARG3"): self.ARG3.append(w.index)
+      if(w.SRLRole == "ARG4"): self.ARG4.append(w.index)
 
   def __extractVerb(self):
     """ SRL Parse: Help us extract verb """
@@ -165,9 +207,14 @@ class Sentence:
     obj["index"] = self.index
     obj["sentence"] = self.sentence
     obj["type"] = self.getTypeName(self.type)
+    obj["verb"] = self.verb
+    obj["ARG0"] = self.ARG0
+    obj["ARG1"] = self.ARG1
+    obj["ARG2"] = self.ARG2
+    obj["ARG3"] = self.ARG3
+    obj["ARG4"] = self.ARG4
     obj["tree"] = self.tree_str
     obj["words"] = self.__getWordsAsArray()
-    obj["verb"] = self.verb
     return json.dumps(obj)
 
 
@@ -182,7 +229,15 @@ class Word:
     self.pos = pos
     self.lemma = word
     self.__setLemma()
+    self.SRLtag = ""
+    self.SRLSuffix = ""
+    self.SRLRole = ""
   
+  def setSRLTag(self,tag,suffix,role):
+    self.SRLtag = tag
+    self.SRLSuffix = suffix
+    self.SRLRole = role
+
   def __setLemma(self):
     lemmatizer = WordNetLemmatizer()
     if(self.pos in ConParser.SET_LABEL_VERB):
@@ -199,4 +254,5 @@ class Word:
     obj["name"] = self.name
     obj["lemma"] = self.lemma
     obj["pos"] = self.pos
+    obj["SRL"] = {'tag':self.SRLtag, 'suffix':self.SRLSuffix, 'role':self.SRLRole}
     return json.dumps(obj)
