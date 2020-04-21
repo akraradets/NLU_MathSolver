@@ -7,7 +7,8 @@ from MSCorpus import ProblemClass
 """ ConstituencyParser """
 class ConParser:
   __instance = None
-  
+
+  SET_LABEL_QUERY = set({'WRB'})  
   SET_LABEL_VERB = set({'VB','VBD','VBG','VBN','VBP','VBZ'})
   SET_LABEL_NOUN = set({'NN','NNS','NNP','NNPS'})
 
@@ -127,7 +128,7 @@ class SRLParser:
 
     words = results['words']
     verbs = []
-    verbs_aux = []
+    auxVerbs = []
     tags = {}
     roles = {}
 
@@ -156,20 +157,20 @@ class SRLParser:
 
       if(isAux == False):
         verbs.append(target['verb'])
-      verbs_aux.append(target['verb'])
+      auxVerbs.append(target['verb'])
       tags[target['verb']] = tagged_words
       roles[target['verb']] = roles_set
 
     self.words = words
     self.verbs = verbs
-    self.verbs_aux = verbs_aux
+    self.auxVerbs = auxVerbs
     self.tags = tags
     self.roles = roles
 
     return self.verbs
 
   def getRealVerb(self,pos):
-    verbs_aux = set(self.verbs_aux)
+    auxVerbs = set(self.auxVerbs)
     obj = {"isExist": False, "word": None, "index":None, "pos":None}
     self.obj_do = obj.copy()
     self.obj_have = obj.copy()
@@ -181,15 +182,15 @@ class SRLParser:
     words = self.words
     real_verb = ""
 
-    if(set_do.isdisjoint(verbs_aux) == False):
-      self.obj_do["word"] = set_do.intersection(verbs_aux).pop()
+    if(set_do.isdisjoint(auxVerbs) == False):
+      self.obj_do["word"] = set_do.intersection(auxVerbs).pop()
       self.obj_do["isExist"] = True
       self.obj_do["index"] = words.index(self.obj_do["word"])
       self.obj_do["pos"] = pos[self.obj_do["index"]]
       self.logger.debug(f"Found do:{self.obj_do}")
-    if(set_have.isdisjoint(verbs_aux) == False):
+    if(set_have.isdisjoint(auxVerbs) == False):
       # if have is real verb or an aux?
-      self.obj_have["word"] = set_have.intersection(verbs_aux).pop()
+      self.obj_have["word"] = set_have.intersection(auxVerbs).pop()
       self.obj_have["isExist"] = True
       self.obj_have["index"] = words.index(self.obj_have["word"])
       self.obj_have["pos"] = pos[self.obj_have["index"]]
@@ -201,7 +202,7 @@ class SRLParser:
 
     if(real_verb == ""):
       # if have not exist, reverb is set(aux)-set_do
-      real_verb = verbs_aux.difference(set_do).pop()
+      real_verb = auxVerbs.difference(set_do).pop()
 
     self.logger.debug(f"Found real_verb:{real_verb}")
     return real_verb

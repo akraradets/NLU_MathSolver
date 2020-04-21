@@ -15,7 +15,10 @@ class LoggerFactory:
         logging.basicConfig(format=format, filename=path+file, datefmt=dateFormat)
         self.logger = logging.getLogger(callerClass.__class__.__name__)
         self.logger.setLevel(logging.DEBUG)
-        
+
+        if self.logger.handlers:
+            self.logger.handlers = []
+
         formatter = logging.Formatter(fmt=format)
         streamHandler = logging.StreamHandler()
         streamHandler.setFormatter(formatter)

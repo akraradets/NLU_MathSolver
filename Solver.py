@@ -1,6 +1,5 @@
 from systems.LoggerFactory import LoggerFactory
-from ConParser import ConParser
-from SRL import SRL
+from MSParser import ConParser,SRLParser
 from WordProcessor import WordProcessor
 from MSCorpus import ProblemClass, MSCorpus
 
@@ -8,7 +7,7 @@ class DeductiveSolver:
   def __init__(self):
     self.logger = LoggerFactory(self).getLogger()
     self.cParser = ConParser.getInstance()
-    self.srl = SRL.getInstance()
+    self.srl = SRLParser.getInstance()
     self.wp = WordProcessor.getInstance()
     self.msc = MSCorpus.getInstance()
 
@@ -35,7 +34,7 @@ class DeductiveSolver:
       self.logger.debug(f"Statement-{index}|statement:{statement}")
 
       verbs = srl.parse(statement)
-      verbs_aux = srl.verbs_aux
+      verbs_aux = srl.auxVerbs
       self.logger.debug(f"Statement-{index}|verbs:{verbs}")
       self.logger.debug(f"Statement-{index}|SRL-Dump:{srl.results}")
 

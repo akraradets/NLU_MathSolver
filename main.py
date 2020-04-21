@@ -55,8 +55,8 @@ class Main:
       2.c Use both information to identify problem class.
     3. Process each sentence according to the problem class.     
     """
-    sentences = sent_tokenize(question)
-    self.logger.debug(f"question:{sentences}")
+    # sentences = sent_tokenize(question)
+    # self.logger.debug(f"question:{sentences}")
 
 
     
