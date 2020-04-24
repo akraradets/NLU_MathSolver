@@ -1,5 +1,6 @@
-{"index": 0, "sentence": "Sam has 5 apples.", "type": "STATEMENT", 
-  "verb": {"isExist": true, "index": 1}, "ARG0": [0], "ARG1": [2, 3], 
+
+[{"index": 0, "sentence": "Sam has 5 apples.", "type": "STATEMENT", 
+  "verb": {"isExist": true, "index": 1}, "tense": "PRESENT_SIMPLE", "ARG0": [0], "ARG1": [2, 3], "ARG2": [], "ARG3": [], "ARG4": [], 
   "tree": "(S (NP (NNP Sam)) (VP (VBZ has) (NP (CD 5) (NNS apples))) (. .))", 
   "words": [
     {"index": 0, "name": "Sam", "lemma": "Sam", "pos": "NNP", "SRL": {"tag": "B-ARG0", "suffix": "B", "role": "ARG0"}}, 
@@ -8,7 +9,7 @@
     {"index": 3, "name": "apples", "lemma": "apple", "pos": "NNS", "SRL": {"tag": "I-ARG1", "suffix": "I", "role": "ARG1"}}, 
     {"index": 4, "name": ".", "lemma": ".", "pos": ".", "SRL": {"tag": "O", "suffix": "", "role": "O"}}]}, 
 {"index": 1, "sentence": "Sam eats 3 apples.", "type": "STATEMENT", 
-  "verb": {"isExist": true, "index": 1}, "ARG0": [0], "ARG1": [2, 3], 
+  "verb": {"isExist": true, "index": 1}, "tense": "PRESENT_SIMPLE", "ARG0": [0], "ARG1": [2, 3], "ARG2": [], "ARG3": [], "ARG4": [], 
   "tree": "(S (NP (NNP Sam)) (VP (VBZ eats) (NP (CD 3) (NNS apples))) (. .))", 
   "words": [
     {"index": 0, "name": "Sam", "lemma": "Sam", "pos": "NNP", "SRL": {"tag": "B-ARG0", "suffix": "B", "role": "ARG0"}}, 
@@ -16,14 +17,14 @@
     {"index": 2, "name": "3", "lemma": "3", "pos": "CD", "SRL": {"tag": "B-ARG1", "suffix": "B", "role": "ARG1"}}, 
     {"index": 3, "name": "apples", "lemma": "apple", "pos": "NNS", "SRL": {"tag": "I-ARG1", "suffix": "I", "role": "ARG1"}}, 
     {"index": 4, "name": ".", "lemma": ".", "pos": ".", "SRL": {"tag": "O", "suffix": "", "role": "O"}}]}, 
-{"index": 2, "sentence": "How many apples did Sam have?", "type": "QUERY", 
-  "verb": {"isExist": true, "index": 5}, "ARG0": [4], "ARG1": [], 
-  "tree": "(SBARQ (WHNP (WRB How) (JJ many) (NNS apples)) (SQ (VBD did) (NP (NNP Sam)) (VP (VB have))) (. ?))", 
+{"index": 2, "sentence": "How many apples does Sam have?", "type": "QUERY", 
+  "verb": {"isExist": true, "index": 5}, "tense": "PRESENT_SIMPLE", "ARG0": [4], "ARG1": [0, 1, 2], "ARG2": [], "ARG3": [], "ARG4": [], 
+  "tree": "(SBARQ (WHNP (WRB How) (JJ many) (NNS apples)) (SQ (VBZ does) (NP (NNP Sam)) (VP (VB have))) (. ?))", 
   "words": [
     {"index": 0, "name": "How", "lemma": "How", "pos": "WRB", "SRL": {"tag": "B-ARG1", "suffix": "B", "role": "ARG1"}}, 
     {"index": 1, "name": "many", "lemma": "many", "pos": "JJ", "SRL": {"tag": "I-ARG1", "suffix": "I", "role": "ARG1"}}, 
     {"index": 2, "name": "apples", "lemma": "apple", "pos": "NNS", "SRL": {"tag": "I-ARG1", "suffix": "I", "role": "ARG1"}}, 
-    {"index": 3, "name": "did", "lemma": "do", "pos": "VBD", "SRL": {"tag": "O", "suffix": "", "role": "O"}}, 
+    {"index": 3, "name": "does", "lemma": "do", "pos": "VBZ", "SRL": {"tag": "O", "suffix": "", "role": "O"}}, 
     {"index": 4, "name": "Sam", "lemma": "Sam", "pos": "NNP", "SRL": {"tag": "B-ARG0", "suffix": "B", "role": "ARG0"}}, 
     {"index": 5, "name": "have", "lemma": "have", "pos": "VB", "SRL": {"tag": "B-V", "suffix": "B", "role": "V"}}, 
     {"index": 6, "name": "?", "lemma": "?", "pos": ".", "SRL": {"tag": "O", "suffix": "", "role": "O"}}]}]

@@ -1,7 +1,7 @@
 from systems.LoggerFactory import LoggerFactory
 from nltk.tokenize import sent_tokenize
 from MSParser import ConParser,SRLParser
-from MSCorpus import ProblemClass
+from MSCorpus import MSCorpus, ProblemClass
 # from nltk.stem.wordnet import WordNetLemmatizer
 from nltk.stem import WordNetLemmatizer 
 import json
@@ -13,7 +13,20 @@ class Question:
 
     self.question = question
     self.sentences = []
+    self.problemClass = None
     self.__construct__()
+    self.__defineProblemClass()
+    self.logger.debug(f"question:{self}")
+
+  def getQuerySentence(self):
+    querySentences = [sent for index, sent in enumerate(self.sentences) if sent.type == Sentence.TYPE_QUERY]
+    if(len(querySentences) != 1):
+      raise ValueError(f"Too many query sentnce. Only expect 1 for now - {querySentences}")
+    return querySentences[0]
+
+  def getStatementSentences(self):
+    statementSentences = [sent for index, sent in enumerate(self.sentences) if sent.type == Sentence.TYPE_STATEMENT]
+    return statementSentences
 
   def __construct__(self):
     # 1. Split the string into sentences.
@@ -22,14 +35,19 @@ class Question:
       s = Sentence(index,sent)
       self.sentences.append( s )
 
-    self.logger.debug(f"question:{self.sentences}")
-
+  def __defineProblemClass(self):
+    # get query sentence
+    querySentence = self.getQuerySentence()
+    verb = querySentence.getVerb()
+    ms = MSCorpus.getInstance()
+    self.problemClass = ms.getProblemClass(verb.lemma)
 
   def __repr__(self):
     return self.__str__()
 
   def __str__(self):
     obj = {}
+    obj["problemCLass"] = ProblemClass.getName(self.problemClass)
     obj["question"] = self.question
     obj["sentencens"] = [json.loads(s.__str__()) for s in self.sentences]
     return json.dumps(obj)
@@ -75,6 +93,13 @@ class Sentence:
     self.__parseSRL()
     self.__setSRLArgument()
 
+  def getArg(self,num):
+    validNum = set({0,1,2,3,4})
+    if(num not in validNum): raise ValueError(f"{num} is not in {validNum}")
+    target = f"ARG{num}"
+    arg = [w for w in self.words if(w.SRLRole == target)]
+    return arg
+
   def getTenseName(self,enum):
     return Sentence.LIST_TENSE.get(enum, "Invalid numbner")
 
@@ -96,7 +121,7 @@ class Sentence:
   def getWordBy(self,index=None):
     if(self.words is None): raise ValueError(f"__parsePOS first")
     if(index != None): return self.words[index]
-    raise ValueError(f"I don't know why")
+    raise ValueError(f"I don't know why. index={index}. word={self.words[index]}")
 
   def __parsePOS(self):
     """ Con Parse: We get parseTree, POS, words """
@@ -195,9 +220,11 @@ class Sentence:
         self.have = obj.copy()
         self.logger.debug(f"Found real_verb:{self.verb} | word:{word}")
 
-    # If there is no do and have, verbs will only have 1 verb.
-    if(self.do["isExist"] == False and self.have["isExist"] == False):
-      tmp = verbs[0]
+    if(self.verb["isExist"] == False):
+      index = 0
+      # if we do exist, verbs[1] is real verb
+      if(self.do["isExist"]): index = 1
+      tmp = auxVerbs[index]
       word = self.getWord(tmp)
       self.verb["isExist"] = True
       self.verb["index"] = word.index
@@ -270,6 +297,13 @@ class Word:
     self.SRLtag = tag
     self.SRLSuffix = suffix
     self.SRLRole = role
+
+  def isEqual(self,word):
+    a = json.loads(self.__str__())
+    b = json.loads(word.__str__())
+    a.pop('index')
+    b.pop('index')
+    return a == b
 
   def __setLemma(self):
     lemmatizer = WordNetLemmatizer()
