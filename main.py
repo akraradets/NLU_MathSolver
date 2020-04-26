@@ -1,7 +1,7 @@
 from systems.LoggerFactory import LoggerFactory
-from nltk.parse.corenlp import CoreNLPDependencyParser
-from nltk.parse.corenlp import CoreNLPParser
-from nltk.tree import ParentedTree
+# from nltk.parse.corenlp import CoreNLPDependencyParser
+# from nltk.parse.corenlp import CoreNLPParser
+# from nltk.tree import ParentedTree
 from nltk.tokenize import sent_tokenize
 import nltk
 from MSParser import ConParser, SRLParser
@@ -10,11 +10,14 @@ from WordProcessor import WordProcessor
 from MSCorpus import MSCorpus, ProblemClass
 from Solver import DeductiveSolver
 from Question import Question
+from Equation import Equation
+
 
 class Main:
   def __init__(self):
     
     self.logger = LoggerFactory(self).getLogger()
+    self.loadModule()
 
   def loadModule(self):
     self.logger.debug('Init ConParser')
@@ -28,25 +31,29 @@ class Main:
     self.logger.debug('Load KnowledgeBase')
     ProblemClass.loadKnowledge(rollback=False)
 
+  def run(self):
+    # 1. Constract & Break question into sentence and word
+    question = Question(self.loadQuestion())
+    self.solve(question)
+
   def loadQuestion(self):
-    question = "Sam has 5 red delicious apples. Sam eats 3 black apples. How many apples does Sam eat?"
+    # question = "Sam has 5 red delicious apples. Sam eats 3 black apples. How many apples does Sam have?"
+    # question = "Sue eats 3 ear of corn. Sue eats 1 more corn. How many corn does Sue eat"
     # question = "Sam had 5 apples this breakfast. Sam ate 3 apples. How many apples did Sam have?"
     # question = "Sam has 5 apples. Sam eats 3 apples. How many apples does Sam have left?"
     # question = "Sam has 5 apples. Sam eats 3 apples. Mark consumes 10 more apples. How many apples does Sam consume?"
-    # question = "Sam has 5 apples. Sam eats 3 apples. Sam eats 10 more apples. How many apples does Sam eat?"
-    # question = "Sam has 5 apples. Sam eats 3 apples. How many apples are in Sam's Stomach?"
+    # question = "Sam has 5 apples. Sam eats 3 apples. Sam eats 10 more apples. How many apples does Sam have?"
+    question = "Sam has 5 apples. Sam eats 3 apples. How many apples are in Sam's Stomach?"
     # question = "Sam has 5 apples. Sam eats 3 apples. How many apples are with Sam?"
     return question
 
-  def run(self):
-    self.loadModule()
+
+  def solve(self,question):
     cParser = self.cParser 
     srl = self.srl
     wp = self.wp
     msc = self.msc
-
-    # 1. Constract & Break question into sentence and word
-    question = Question(self.loadQuestion())
+    
     # The question will be constructed as follow
     # [{"index": 0, "sentence": "Sam has 5 apples.", "type": "STATEMENT", 
     #   "verb": {"isExist": true, "index": 1}, "tense": "PRESENT_SIMPLE", "ARG0": [0], "ARG1": [2, 3], "ARG2": [], "ARG3": [], "ARG4": [], 
@@ -79,8 +86,8 @@ class Main:
     #     {"index": 6, "name": "?", "lemma": "?", "pos": ".", "SRL": {"tag": "O", "suffix": "", "role": "O"}}]}]
     
     # Tagging Question Type
+    equation = Equation()
     if(question.problemClass == ProblemClass.DEDUCTIVE):
-      equation = []
       # Deductive - counting number of entity due to the target action
       self.logger.debug(f"Calling deductiveSolver")
       query = question.getQuerySentence()
@@ -97,16 +104,39 @@ class Main:
         self.logger.debug(f"{statement.index}-Extract|action:{state_action.lemma}|actor:{state_actor}|entity:{state_entity}")
         sameActor = self.compareObj(query_actor,state_actor)
         sameEntity = self.compareObj(query_entity,state_entity, partial=True)
-        sameAction = wp.isSimilar(query_action.lemma, state_action.lemma, 'v')
+        sameAction = wp.isSimilar(query_action.lemma, state_action.lemma, 'v') and msc.getProblemClass(state_action.lemma) == ProblemClass.DEDUCTIVE
         self.logger.debug(f"{statement.index}-Compare|action:{sameAction}|actor:{sameActor}|entity:{sameEntity}")
         if(sameActor and sameAction and sameEntity):
-          equation.append(f"add({state_entity['quantity']})")
+          equation.add(state_entity['quantity'])
 
-      print(equation)
     elif(question.problemClass == ProblemClass.POSSESSIVE):
       self.logger.debug(f"Calling possessiveSolver")
-      pass
-  
+      query = question.getQuerySentence()
+      query_actor = self.buildObj(query.getArg(0))
+      query_entity = [w for w in query.getArg(1) if ( w.name.lower() not in set({'how','many'}) ) ]
+      query_entity = self.buildObj(query_entity)
+      query_action = query.getVerb()
+      self.logger.debug(f"Query-Extract|action:{query_action.lemma}|actor:{query_actor}|entity:{query_entity}")
+      statements = question.getStatementSentences()
+      for statement in statements:
+        state_actor = self.buildObj(statement.getArg(0))
+        state_entity = self.buildObj(statement.getArg(1))
+        state_action = statement.getVerb()
+        self.logger.debug(f"{statement.index}-Extract|action:{state_action.lemma}|actor:{state_actor}|entity:{state_entity}")
+        sameActor = self.compareObj(query_actor,state_actor)
+        sameEntity = self.compareObj(query_entity,state_entity, partial=True)
+        actionClass = msc.getProblemClass(state_action.lemma)
+        self.logger.debug(f"{statement.index}-Compare|action:{ProblemClass.getName(actionClass)}|actor:{sameActor}|entity:{sameEntity}")
+        if(state_action.lemma == 'have'):
+          equation.add(state_entity['quantity'])       
+        elif(actionClass == ProblemClass.DEDUCTIVE):
+          equation.minus(state_entity['quantity'])
+
+    print(equation)
+    equation.pprint()
+    print(equation.evalute())
+
+
   def compareObj(self,o1,o2,partial=False):
     c1 = o1['name'] == o2['name']
     c2 = None
