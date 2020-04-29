@@ -12,6 +12,8 @@ class ProblemClass:
   FILE_DEDUCTIVE = "deductive.yml"
   FILE_POSSESSIVE = "possessive.yml"
   FILE_EATABLE = "eatable.yml"
+  FILE_PERSON_MALE = "person_male.yml"
+  FILE_PERSON_FEMALE = "person_female.yml"
 
   LIST_FILE_CORRUPTED = [False,False]
   LIST_SET = {
@@ -27,6 +29,9 @@ class ProblemClass:
 
   SET_DO = set({'do','does','did','done'})
   SET_HAVE = set({'have', 'has', 'had'})
+
+  SET_PERSON_MALE = set()
+  SET_PERSON_FEMALE = set()
 
   @staticmethod
   def getName(enum):
@@ -92,32 +97,36 @@ class ProblemClass:
     finally:
       if(fail and rollback):
         logger.error(f"Cannot open file {filename}. Use default set value")
-    # try:
-    #   deductive = ProblemClass.DIR_KB + ProblemClass.FILE_DEDUCTIVE
-    #   with open(deductive, 'r') as stream:
-    #     ProblemClass.DEDUCTIVE_SET = set(yaml.safe_load(stream))
-    # except FileNotFoundError as f:
-    #   if(rollback == False): raise f
-    # except:
-    #   ProblemClass.FILE_DEDUCTIVE_CORRUPTED = True
-    #   if(rollback == False): raise Exception(f"{deductive} is corrupted.")
-    # finally:
-    #   if(rollback):
-    #     logger.error(f"Cannot open file {deductive}. Use default set value")
 
-    # try:
-    #   possessive = ProblemClass.DIR_KB + ProblemClass.FILE_POSSESSIVE
-    #   with open(possessive, 'r') as stream:
-    #     ProblemClass.POSSESSIVE_SET = set(yaml.safe_load(stream))
-    # except FileNotFoundError as f:
-    #   if(rollback == False): raise f
-    # except:
-    #   ProblemClass.FILE_POSSESSIVE_CORRUPTED = True
-    #   if(rollback == False): raise Exception(f"{possessive} is corrupted.")
-    # finally:
-    #   if(rollback):
-    #     logger.error(f"Cannot open file {possessive}. Use default set value")
+    """ Load person_male set """
+    filename = dir_kb + ProblemClass.FILE_PERSON_MALE
+    fail = True
+    try:
+      with open(filename, 'r') as stream:
+        ProblemClass.SET_PERSON_MALE = yaml.safe_load(stream)
+      fail = False
+    except FileNotFoundError as f:
+      if(rollback == False): raise f
+    except:
+      if(rollback == False): raise Exception(f"{filename} is corrupted.")
+    finally:
+      if(fail and rollback):
+        logger.error(f"Cannot open file {filename}. Use default set value")
 
+    """ Load person_female set """
+    filename = dir_kb + ProblemClass.FILE_PERSON_FEMALE
+    fail = True
+    try:
+      with open(filename, 'r') as stream:
+        ProblemClass.SET_PERSON_FEMALE = yaml.safe_load(stream)
+      fail = False
+    except FileNotFoundError as f:
+      if(rollback == False): raise f
+    except:
+      if(rollback == False): raise Exception(f"{filename} is corrupted.")
+    finally:
+      if(fail and rollback):
+        logger.error(f"Cannot open file {filename}. Use default set value")
 
 class MSCorpus:
   __instance = None

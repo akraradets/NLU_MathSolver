@@ -26,7 +26,7 @@ class Equation:
     return Equation.LIST_OPER_SYMBOL.get(enum, "Invalid numbner")
 
   def evalute(self):
-    ans = eval(self.__prettify())
+    ans = eval(self.prettify())
     return ans
     # for t in enumerate(self.data):
 
@@ -39,10 +39,10 @@ class Equation:
     self.data.append(obj)
 
   def pprint(self):
-    s = self.__prettify()
+    s = self.prettify()
     print(s)
 
-  def __prettify(self):
+  def prettify(self):
     s = ""
     for i,t in enumerate(self.data):
       if i == 0 and t[0] == Equation.OPER_ADD:

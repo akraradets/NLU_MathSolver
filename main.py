@@ -8,10 +8,10 @@ from MSParser import ConParser, SRLParser
 
 from WordProcessor import WordProcessor
 from MSCorpus import MSCorpus, ProblemClass
-from Solver import DeductiveSolver
+from Solver import PossessiveSolver
 from Question import Question
 from Equation import Equation
-
+import json
 
 class Main:
   def __init__(self):
@@ -32,20 +32,36 @@ class Main:
     ProblemClass.loadKnowledge(rollback=False)
 
   def run(self):
+    dataset = self.loadQuestion()
+    for data in dataset:
+      question = Question(data['Question'])
+      equation = self.solve(question)
+      self.logger.debug(f"Equation:{equation.prettify()}|Dump:{equation}")
+      answer = equation.evalute()
+      if(answer != data['Answer']):
+        self.logger.info(f"{data['No.']} is ***incorrect***.|Answer:{answer}|Correct:{data['Answer']}")
+        break
+      else:
+        self.logger.info(f"{data['No.']} is correct|Answer:{answer}|Correct:{data['Answer']}")
     # 1. Constract & Break question into sentence and word
-    question = Question(self.loadQuestion())
-    self.solve(question)
+    # question = Question(self.loadQuestion())
+    # self.solve(question)
 
   def loadQuestion(self):
+    filename = "Dataset/dataset_new.json"
+    with open(filename, 'r') as stream:
+      dataset = json.loads(stream.read())
+    # print(dataset_json)
     # question = "Sam has 5 red delicious apples. Sam eats 3 black apples. How many apples does Sam have?"
     # question = "Sue eats 3 ear of corn. Sue eats 1 more corn. How many corn does Sue eat"
     # question = "Sam had 5 apples this breakfast. Sam ate 3 apples. How many apples did Sam have?"
     # question = "Sam has 5 apples. Sam eats 3 apples. How many apples does Sam have left?"
     # question = "Sam has 5 apples. Sam eats 3 apples. Mark consumes 10 more apples. How many apples does Sam consume?"
     # question = "Sam has 5 apples. Sam eats 3 apples. Sam eats 10 more apples. How many apples does Sam have?"
-    question = "Sam has 5 apples. Sam eats 3 apples. How many apples are in Sam's Stomach?"
+    # question = "Sam has 5 apples. Sam eats 3 apples. How many apples are in Sam's Stomach?"
     # question = "Sam has 5 apples. Sam eats 3 apples. How many apples are with Sam?"
-    return question
+
+    return dataset
 
 
   def solve(self,question):
@@ -111,31 +127,31 @@ class Main:
 
     elif(question.problemClass == ProblemClass.POSSESSIVE):
       self.logger.debug(f"Calling possessiveSolver")
-      query = question.getQuerySentence()
-      query_actor = self.buildObj(query.getArg(0))
-      query_entity = [w for w in query.getArg(1) if ( w.name.lower() not in set({'how','many'}) ) ]
-      query_entity = self.buildObj(query_entity)
-      query_action = query.getVerb()
-      self.logger.debug(f"Query-Extract|action:{query_action.lemma}|actor:{query_actor}|entity:{query_entity}")
-      statements = question.getStatementSentences()
-      for statement in statements:
-        state_actor = self.buildObj(statement.getArg(0))
-        state_entity = self.buildObj(statement.getArg(1))
-        state_action = statement.getVerb()
-        self.logger.debug(f"{statement.index}-Extract|action:{state_action.lemma}|actor:{state_actor}|entity:{state_entity}")
-        sameActor = self.compareObj(query_actor,state_actor)
-        sameEntity = self.compareObj(query_entity,state_entity, partial=True)
-        actionClass = msc.getProblemClass(state_action.lemma)
-        self.logger.debug(f"{statement.index}-Compare|action:{ProblemClass.getName(actionClass)}|actor:{sameActor}|entity:{sameEntity}")
-        if(state_action.lemma == 'have'):
-          equation.add(state_entity['quantity'])       
-        elif(actionClass == ProblemClass.DEDUCTIVE):
-          equation.minus(state_entity['quantity'])
+      ps = PossessiveSolver()
+      equation = ps.process(question)
+      # query = question.getQuerySentence()
+      # query_actor = self.buildObj(query.getArg(0))
+      # print(f"================ {query.getArg(0)}")
+      # query_entity = [w for w in query.getArg(1) if ( w.name.lower() not in set({'how','many'}) ) ]
+      # query_entity = self.buildObj(query_entity)
+      # query_action = query.getVerb()
+      # self.logger.debug(f"Query-Extract|action:{query_action.lemma}|actor:{query_actor}|entity:{query_entity}")
+      # statements = question.getStatementSentences()
+      # for statement in statements:
+      #   state_actor = self.buildObj(statement.getArg(0))
+      #   state_entity = self.buildObj(statement.getArg(1))
+      #   state_action = statement.getVerb()
+      #   self.logger.debug(f"{statement.index}-Extract|action:{state_action.lemma}|actor:{state_actor}|entity:{state_entity}")
+      #   sameActor = self.compareObj(query_actor,state_actor)
+      #   sameEntity = self.compareObj(query_entity,state_entity, partial=True)
+      #   actionClass = msc.getProblemClass(state_action.lemma)
+      #   self.logger.debug(f"{statement.index}-Compare|action:{ProblemClass.getName(actionClass)}|actor:{sameActor}|entity:{sameEntity}")
+      #   if(state_action.lemma == 'have'):
+      #     equation.add(state_entity['quantity'])       
+      #   elif(actionClass == ProblemClass.DEDUCTIVE):
+      #     equation.minus(state_entity['quantity'])
 
-    print(equation)
-    equation.pprint()
-    print(equation.evalute())
-
+    return equation
 
   def compareObj(self,o1,o2,partial=False):
     c1 = o1['name'] == o2['name']
