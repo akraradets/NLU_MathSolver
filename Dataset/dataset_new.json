@@ -1,7 +1,32 @@
 [
   {
-    "No.": 1,
+    "No.": "21-6",
     "Question": "Janet has 3 dresses. Kim has 7 dresses. How many dresses do they have altogether?",
     "Answer": 10
+  },
+  {
+    "No.": "21-7",
+    "Question": "Helen has 5 hairclips. Mendy has 3 hairclips. How many hairclips do they have altogether?",
+    "Answer": 8
+  },
+  {
+    "No.": "21-8",
+    "Question": "There are 7 large eggs in a basket. There are 2 small eggs in a basket. How many eggs are there in the basket?",
+    "Answer": 9
+  },
+  {
+    "No.": "21-8.1",
+    "Question": "There are 7 large eggs in a basket. There are 5 medium eggs in a basket. There are 2 small eggs in a basket. How many eggs are there in the basket?",
+    "Answer": 14
+  },
+  {
+    "No.": "21-8.2",
+    "Question": "There are 7 large eggs in a basket. There are 5 medium eggs in a basket. There are 2 small eggs in a basket. How many small eggs are there in the basket?",
+    "Answer": 2
+  },
+  {
+    "No.": "22-6.1",
+    "Question": "Tony colours 17 animals. Cecilia coulors 9 animals. How many animals does Tony colour?",
+    "Answer": 2
   }
 ]

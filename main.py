@@ -34,6 +34,7 @@ class Main:
   def run(self):
     dataset = self.loadQuestion()
     for data in dataset:
+      print(f"================ Question-{data['No.']} ================")
       question = Question(data['Question'])
       equation = self.solve(question)
       self.logger.debug(f"Equation:{equation.prettify()}|Dump:{equation}")

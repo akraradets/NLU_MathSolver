@@ -73,7 +73,7 @@ class Entity:
   def __str__(self):
     obj = {}
     obj['quantity'] = self.quantity
-    obj['adjective'] = dict(self.adjective)
+    obj['adjective'] = list(self.adjective)
     obj['name'] = self.name
     obj['type'] = self.getTypeName()
     if(self.type == Entity.TYPE_HUMAN): obj['gender'] = self.getGenderName()
