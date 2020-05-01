@@ -2,7 +2,7 @@ from systems.LoggerFactory import LoggerFactory
 import nltk
 from nltk.corpus import wordnet as wn
 from nltk.stem.wordnet import WordNetLemmatizer
-from MSCorpus import ProblemClass
+from MSCorpus import WordSem
 
 class WordProcessor:
   __instance = None
