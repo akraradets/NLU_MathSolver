@@ -7,15 +7,20 @@ from nltk.stem import WordNetLemmatizer
 import json
 
 class Question:
+  CLASS_COUNTING = 0
+  LIST_CLASS = {
+    0 : "COUNTING"
+  }
+
   def __init__(self, question):
     self.logger = LoggerFactory(self).getLogger()
     if(question == ""): raise ValueError(f"question is an empty string")    
 
     self.question = question
     self.sentences = []
-    self.WordSem = None
+    self.problemClass = None
     self.__construct__()
-    self.__defineWordSem()
+    self.__defineProblemClass()
     self.logger.debug(f"question:{self}")
 
   def getQuerySentence(self):
@@ -35,7 +40,7 @@ class Question:
       s = Sentence(index,sent)
       self.sentences.append( s )
 
-  def __defineWordSem(self):
+  def __defineProblemClass(self):
     # get query sentence
     querySentence = self.getQuerySentence()
     # detecting sentence structure.
@@ -47,19 +52,22 @@ class Question:
 
     verb = querySentence.getVerb()
     ms = MSCorpus.getInstance()
-    self.WordSem = ms.getWordSem(verb.lemma)
+    self.problemClass = ms.getWordSem(verb.lemma)
 
   def __repr__(self):
     return self.__str__()
 
   def __str__(self):
     obj = {}
-    obj["WordSem"] = WordSem.getName(self.WordSem)
+    obj["problemClass"] = WordSem.getName(self.problemClass)
     obj["question"] = self.question
     obj["sentencens"] = [json.loads(s.__str__()) for s in self.sentences]
     return json.dumps(obj)
 
-
+class QuestionTemplate:
+  def __init__(self):
+    self.logger = LoggerFactory(self).getLogger()
+    self.counting = Sentence(0,"How many object does someone verb")
 
 class Sentence:
   # Tense
@@ -330,3 +338,6 @@ class Word:
     obj["pos"] = self.pos
     obj["SRL"] = {'tag':self.SRLtag, 'suffix':self.SRLSuffix, 'role':self.SRLRole}
     return json.dumps(obj)
+
+qt = QuestionTemplate()
+print(qt.counting)

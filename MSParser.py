@@ -1,6 +1,131 @@
 from systems.LoggerFactory import LoggerFactory
 from allennlp.predictors.predictor import Predictor
 from nltk.tokenize import word_tokenize
+from treelib import Node, Tree
+import json
+
+""" Construct a parsetree from ConstituencyParser """
+class ParseTree:
+  SEARCH_DFS = 0
+  SEARCH_BFS = 1
+
+  def __init__(self,root):
+    rootNode = ParseNode(root)
+    self.root = rootNode
+    self.height = 1
+    self.appendChildToNode(parent=self.root,children=root['children'])
+  
+  def appendChildToNode(self,parent,children):
+    for node in children:
+      pnode = ParseNode(node)
+      pnode.setParent(parent)
+      parent.addChild(pnode)
+      if('children' in node.keys()):
+        self.appendChildToNode(parent=pnode,children=node['children'])
+      if(pnode.level > self.height): self.height = pnode.level
+  
+  @staticmethod
+  def __callback_print(node):
+    str = "|" + "--" * node.level + node.__str__()
+    return str + "\n"
+
+  @staticmethod
+  def __callback_print_structure(node,noLeaf):
+    if(node.isLeaf() == False):
+      result = "|" + "--" * node.level + node.nodeType
+      return result + "\n"
+    return ""
+
+  @staticmethod
+  def __callback_compare_word(node,word):
+    if(node.word.lower() == word.lower()):
+      return node
+
+  def getStructure(self):
+    noLeaf = True
+    return self.__DFS(callback=ParseTree.__callback_print_structure,cargs=(noLeaf,))
+
+  def search(self,word,search=0):
+    if(search == ParseTree.SEARCH_DFS):
+      return self.__DFS(callback=ParseTree.__callback_compare_word,cargs=(word,))
+    elif(search == ParseTree.SEARCH_BFS):
+      return self.__BFS(callback=ParseTree.__callback_compare_word,cargs=(word,))
+    else:
+      raise ValueError(f"{search} value is invalid.")
+
+  def __DFS(self,callback=None,cargs=()):
+    # print(*cargs)
+    return self.__recurDFS__(self.root,callback,cargs)
+
+  def __recurDFS__(self,node,callback,cargs):
+    result = callback(node,*cargs)
+    if(result == True): return node
+    for c in node.children:
+      childResult = self.__recurDFS__(c,callback,cargs)
+      # print(type(childResult))
+      if(type(childResult) == type(node)): return childResult
+      if(type(childResult) == type('a')): result = result + childResult
+    return result
+
+  def __BFS(self,callback,cargs):
+    queue = [self.root]
+    for node in queue:
+      result = callback(node,(*cargs))
+      if(type(result) == type(True)): return node
+      queue.extend(node.children)
+
+  def __repr__(self):
+    return self.__str__()
+
+  def __str__(self):
+    return self.__DFS(callback=ParseTree.__callback_print,cargs=())
+
+# from MSParser import ParseTree, ConParser, ParseNode
+# sent = "How many apples does Sam eat?"
+# cParser = ConParser.getInstance()
+# cParser.parse(sent)
+# tree = cParser.tree
+# p = ParseTree(tree)
+
+class ParseNode:
+  def __init__(self,node):
+    self.word = node['word']
+    self.nodeType = node['nodeType']
+    self.attributes = node['attributes']
+    self.link = node['link']
+    self.children = []
+    self.parent = None
+    self.level = 0
+
+  def isRoot(self):
+    return self.parent == None
+
+  def isLeaf(self):
+    return self.children == []
+
+  def addChild(self,node):
+    self.children.append(node)
+  
+  def setParent(self,node):
+    self.parent = node
+    self.level = node.level + 1
+
+  def __repr__(self):
+    return self.__str__()
+
+  def __str__(self):
+    obj = {}
+    # obj['parent'] = self.parent
+    obj['level'] = self.level
+    obj['word'] = self.word
+    obj['nodeType'] = self.nodeType
+    obj['attributes'] = self.attributes
+    obj['link'] = self.link
+    # obj['children'] = [json.loads(s.__str__()) for s in self.children]
+    return json.dumps(obj)
+
+
+
 
 """ ConstituencyParser """
 class ConParser:
