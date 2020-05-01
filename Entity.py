@@ -1,6 +1,6 @@
 from systems.LoggerFactory import LoggerFactory
 from MSParser import ConParser
-from MSCorpus import ProblemClass
+from MSCorpus import WordSem
 import json
 
 class Entity:
@@ -51,13 +51,13 @@ class Entity:
         self.type = Entity.TYPE_OBJECT
         # A proper Noun
         if(w.pos == 'NNP'):
-          # print(ProblemClass.SET_PERSON_MALE)
-          # print(w.name.upper() in ProblemClass.SET_PERSON_MALE)
+          # print(WordSem.SET_PERSON_MALE)
+          # print(w.name.upper() in WordSem.SET_PERSON_MALE)
           # check if it in the set of human common name
-          if(w.name.upper() in ProblemClass.SET_PERSON_MALE):
+          if(w.name.upper() in WordSem.SET_PERSON_MALE):
             self.type = Entity.TYPE_HUMAN
             self.gender = Entity.GENDER_MALE
-          elif(w.name.upper() in ProblemClass.SET_PERSON_FEMALE):  
+          elif(w.name.upper() in WordSem.SET_PERSON_FEMALE):  
             self.type = Entity.TYPE_HUMAN
             self.gender = Entity.GENDER_FEMALE
 

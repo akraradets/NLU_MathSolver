@@ -7,7 +7,7 @@ import nltk
 from MSParser import ConParser, SRLParser
 
 from WordProcessor import WordProcessor
-from MSCorpus import MSCorpus, ProblemClass
+from MSCorpus import MSCorpus, WordSem
 from Solver import PossessiveSolver
 from Question import Question
 from Equation import Equation
@@ -29,7 +29,7 @@ class Main:
     self.logger.debug('Init MSCorpus')
     self.msc = MSCorpus.getInstance()
     self.logger.debug('Load KnowledgeBase')
-    ProblemClass.loadKnowledge(rollback=False)
+    WordSem.loadKnowledge(rollback=False)
 
   def run(self):
     dataset = self.loadQuestion()
@@ -104,7 +104,7 @@ class Main:
     
     # Tagging Question Type
     equation = Equation()
-    if(question.problemClass == ProblemClass.DEDUCTIVE):
+    if(question.WordSem == WordSem.DEDUCTIVE):
       # Deductive - counting number of entity due to the target action
       self.logger.debug(f"Calling deductiveSolver")
       query = question.getQuerySentence()
@@ -121,12 +121,12 @@ class Main:
         self.logger.debug(f"{statement.index}-Extract|action:{state_action.lemma}|actor:{state_actor}|entity:{state_entity}")
         sameActor = self.compareObj(query_actor,state_actor)
         sameEntity = self.compareObj(query_entity,state_entity, partial=True)
-        sameAction = wp.isSimilar(query_action.lemma, state_action.lemma, 'v') and msc.getProblemClass(state_action.lemma) == ProblemClass.DEDUCTIVE
+        sameAction = wp.isSimilar(query_action.lemma, state_action.lemma, 'v') and msc.getWordSem(state_action.lemma) == WordSem.DEDUCTIVE
         self.logger.debug(f"{statement.index}-Compare|action:{sameAction}|actor:{sameActor}|entity:{sameEntity}")
         if(sameActor and sameAction and sameEntity):
           equation.add(state_entity['quantity'])
 
-    elif(question.problemClass == ProblemClass.POSSESSIVE):
+    elif(question.WordSem == WordSem.POSSESSIVE):
       self.logger.debug(f"Calling possessiveSolver")
       ps = PossessiveSolver()
       equation = ps.process(question)
@@ -145,11 +145,11 @@ class Main:
       #   self.logger.debug(f"{statement.index}-Extract|action:{state_action.lemma}|actor:{state_actor}|entity:{state_entity}")
       #   sameActor = self.compareObj(query_actor,state_actor)
       #   sameEntity = self.compareObj(query_entity,state_entity, partial=True)
-      #   actionClass = msc.getProblemClass(state_action.lemma)
-      #   self.logger.debug(f"{statement.index}-Compare|action:{ProblemClass.getName(actionClass)}|actor:{sameActor}|entity:{sameEntity}")
+      #   actionClass = msc.getWordSem(state_action.lemma)
+      #   self.logger.debug(f"{statement.index}-Compare|action:{WordSem.getName(actionClass)}|actor:{sameActor}|entity:{sameEntity}")
       #   if(state_action.lemma == 'have'):
       #     equation.add(state_entity['quantity'])       
-      #   elif(actionClass == ProblemClass.DEDUCTIVE):
+      #   elif(actionClass == WordSem.DEDUCTIVE):
       #     equation.minus(state_entity['quantity'])
 
     return equation

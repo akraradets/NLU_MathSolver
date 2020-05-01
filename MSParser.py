@@ -2,8 +2,6 @@ from systems.LoggerFactory import LoggerFactory
 from allennlp.predictors.predictor import Predictor
 from nltk.tokenize import word_tokenize
 
-from MSCorpus import ProblemClass
-
 """ ConstituencyParser """
 class ConParser:
   __instance = None

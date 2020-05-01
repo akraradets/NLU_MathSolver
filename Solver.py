@@ -1,8 +1,7 @@
 from systems.LoggerFactory import LoggerFactory
 from Entity import Entity
 from Equation import Equation
-from MSCorpus import ProblemClass 
-from MSCorpus import MSCorpus
+from MSCorpus import WordSem, MSCorpus
 
 class Solver:
   @staticmethod
@@ -46,12 +45,12 @@ class PossessiveSolver(Solver):
       # Check if the sentence is a concerned information or not
       sameActor = Solver.compareEntity(query_actor,state_actor)
       sameEntity = Solver.compareEntity(query_entity,state_entity, partial=True)
-      actionClass = msc.getProblemClass(state_action.lemma)
-      self.logger.debug(f"{statement.index}-Compare|action:{ProblemClass.getName(actionClass)}|actor:{sameActor}|entity:{sameEntity}")
+      actionClass = msc.getWordSem(state_action.lemma)
+      self.logger.debug(f"{statement.index}-Compare|action:{WordSem.getName(actionClass)}|actor:{sameActor}|entity:{sameEntity}")
       if(sameActor and sameEntity):
-        if(state_action.lemma == 'have' or actionClass == ProblemClass.POSSESSIVE):
+        if(state_action.lemma == 'have' or actionClass == WordSem.POSSESSIVE):
           equation.add(state_entity.quantity)
-        elif(actionClass == ProblemClass.DEDUCTIVE):
+        elif(actionClass == WordSem.DEDUCTIVE):
           equation.minus(state_entity.quantity)
       else:
         print("xxxxxxxx Not a concern sentence. xxxxxxxx")

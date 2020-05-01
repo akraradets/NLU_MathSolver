@@ -1,7 +1,7 @@
 from systems.LoggerFactory import LoggerFactory
 from nltk.tokenize import sent_tokenize
 from MSParser import ConParser,SRLParser
-from MSCorpus import MSCorpus, ProblemClass
+from MSCorpus import MSCorpus, WordSem
 # from nltk.stem.wordnet import WordNetLemmatizer
 from nltk.stem import WordNetLemmatizer 
 import json
@@ -13,9 +13,9 @@ class Question:
 
     self.question = question
     self.sentences = []
-    self.problemClass = None
+    self.WordSem = None
     self.__construct__()
-    self.__defineProblemClass()
+    self.__defineWordSem()
     self.logger.debug(f"question:{self}")
 
   def getQuerySentence(self):
@@ -35,19 +35,26 @@ class Question:
       s = Sentence(index,sent)
       self.sentences.append( s )
 
-  def __defineProblemClass(self):
+  def __defineWordSem(self):
     # get query sentence
     querySentence = self.getQuerySentence()
+    # detecting sentence structure.
+    # Class 1: counting
+    # Structure: How many [object] {do} [someone] {verb - possession} [optional]
+    # Solution: These type of problem class ask us to count the number of object that someone acting on it. 
+    #           the counting must accounting for interchangeble verb list consume - eat and colour - paint.
+
+
     verb = querySentence.getVerb()
     ms = MSCorpus.getInstance()
-    self.problemClass = ms.getProblemClass(verb.lemma)
+    self.WordSem = ms.getWordSem(verb.lemma)
 
   def __repr__(self):
     return self.__str__()
 
   def __str__(self):
     obj = {}
-    obj["problemCLass"] = ProblemClass.getName(self.problemClass)
+    obj["WordSem"] = WordSem.getName(self.WordSem)
     obj["question"] = self.question
     obj["sentencens"] = [json.loads(s.__str__()) for s in self.sentences]
     return json.dumps(obj)
@@ -187,8 +194,8 @@ class Sentence:
     self.have = obj.copy()
     self.verb = obj.copy()
 
-    set_do = ProblemClass.SET_DO
-    set_have = ProblemClass.SET_HAVE
+    set_do = WordSem.SET_DO
+    set_have = WordSem.SET_HAVE
     set_label_verb = ConParser.SET_LABEL_VERB
     words = self.words
     if(set_do.isdisjoint(set_auxVerbs) == False):
