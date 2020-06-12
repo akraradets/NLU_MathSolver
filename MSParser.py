@@ -1,7 +1,7 @@
 from systems.LoggerFactory import LoggerFactory
 from allennlp.predictors.predictor import Predictor
 from nltk.tokenize import word_tokenize
-from treelib import Node, Tree
+# from treelib import Node, Tree
 import json
 
 """ Construct a parsetree from ConstituencyParser """

@@ -1,5 +1,6 @@
 __pycache__/*
 logs/*
+!logs/.keep
 .vscode/*
 libs/*
 systems/__pycache__/*
