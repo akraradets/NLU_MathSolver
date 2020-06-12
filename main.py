@@ -104,7 +104,7 @@ class Main:
     
     # Tagging Question Type
     equation = Equation()
-    if(question.WordSem == WordSem.DEDUCTIVE):
+    if(question.problemClass == WordSem.DEDUCTIVE):
       # Deductive - counting number of entity due to the target action
       self.logger.debug(f"Calling deductiveSolver")
       query = question.getQuerySentence()
@@ -126,7 +126,7 @@ class Main:
         if(sameActor and sameAction and sameEntity):
           equation.add(state_entity['quantity'])
 
-    elif(question.WordSem == WordSem.POSSESSIVE):
+    elif(question.problemClass == WordSem.POSSESSIVE):
       self.logger.debug(f"Calling possessiveSolver")
       ps = PossessiveSolver()
       equation = ps.process(question)
