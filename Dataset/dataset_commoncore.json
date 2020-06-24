@@ -1,0 +1,101 @@
+[
+  {
+    "No.": "3.9",
+    "Question": "There are 2 large eggs and 3 small eggs in a basket. How many eggs are there in the basket?",
+    "Type": "Put Together / Take Apart",
+    "Equation": "2 + 3",
+    "Answer": "5"
+  },
+  {
+    "No.": "3.10",
+    "Question": "Janet has 2 dresses. Kim has 3 dresses. How many dresses do they have altogether?",
+    "Type": "Put Together / Take Apart",
+    "Equation": "2 + 3",
+    "Answer": "5"
+  },
+  {
+    "No.": "3.11",
+    "Question": "Tony colours 2 animals. Cecilia colours 3 animals. How many animals do they colour in total?",
+    "Type": "Put Together / Take Apart",
+    "Equation": "2 + 3",
+    "Answer": "5"
+  },
+  {
+    "No.": "3.12",
+    "Question": "The basket has 2 large eggs and 3 small eggs in it. How many eggs are there in the basket?",
+    "Type": "Put Together / Take Apart",
+    "Equation": "2 + 3",
+    "Answer": "5"
+  },
+  {
+    "No.": "3.13",
+    "Question": "Sam has 2 dogs. Emily has 3 cats. How many pets do they own?",
+    "Type": "Put Together / Take Apart",
+    "Equation": "2 + 3",
+    "Answer": "5"
+  },
+
+  {
+    "No.": "3.14",
+    "Question": "There are 2 apples on the table. Sam put 3 more apples on the table. How many apples are there?",
+    "Type": "Add to",
+    "Equation": "2 + 3",
+    "Answer": "5"
+  },
+  {
+    "No.": "3.15",
+    "Question": "Sam has 2 apples. He buys 3 more apples. How many apples does Sam have?",
+    "Type": "Add to",
+    "Equation": "2 + 3",
+    "Answer": "5"
+  },
+  {
+    "No.": "3.16",
+    "Question": "Sam pick 2 apples. He picks 3 more apples. How many apples does Sam pick?",
+    "Type": "Add to",
+    "Equation": "2 + 3",
+    "Answer": "5"
+  },
+  {
+    "No.": "3.17",
+    "Question": "Sam eats 2 apples. He eats 3 more apples. How many apples does Sam eat?",
+    "Type": "Add to",
+    "Equation": "2 + 3",
+    "Answer": "5"
+  },
+  {
+    "No.": "3.18",
+    "Question": "Sam eats 2 apples. He eats 3 more apples. How many apples does Sam consume?",
+    "Type": "Add to",
+    "Equation": "2 + 3",
+    "Answer": "5"
+  },
+  {
+    "No.": "3.5",
+    "Question": "2 bunnies sat on the grass. 3 more bunnies hopped there. How many bunnies are on the grass now?",
+    "Type": "Add to",
+    "Equation": "2 + 3",
+    "Answer": "5"
+  },
+  {
+    "No.": "3.6",
+    "Question": "2 red apples and 3 green apples are on the table. How many apples are on the table?",
+    "Type": "Put Together / Take Apart",
+    "Equation": "2 + 3",
+    "Answer": "5"
+  },
+  {
+    "No.": "3.7",
+    "Question": "Julie has 3 more apples than Lucy. Lucy has 2 apples. How many apples doesJulie have?",
+    "Type": "Compare",
+    "Equation": "2 + 3",
+    "Answer": "5"
+  },
+  {
+    "No.": "3.8",
+    "Question": "Lucy has 3 fewer apples than Julie. Lucy has 2 apples. How many apples doesJulie have?",
+    "Type": "Compare",
+    "Equation": "2 + 3",
+    "Answer": "5"
+  }
+]

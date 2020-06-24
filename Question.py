@@ -20,7 +20,7 @@ class Question:
     self.sentences = []
     self.problemClass = None
     self.__construct__()
-    self.__defineProblemClass()
+    # self.__defineProblemClass()
     self.logger.debug(f"question:{self}")
 
   def getQuerySentence(self):
