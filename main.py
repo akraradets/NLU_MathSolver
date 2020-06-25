@@ -49,7 +49,7 @@ class Main:
     # self.solve(question)
 
   def loadQuestion(self):
-    filename = "Dataset/dataset_new.json"
+    filename = "Dataset/dataset_commoncore_selected.json"
     with open(filename, 'r') as stream:
       dataset = json.loads(stream.read())
     # print(dataset_json)

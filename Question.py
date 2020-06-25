@@ -64,10 +64,10 @@ class Question:
     obj["sentencens"] = [json.loads(s.__str__()) for s in self.sentences]
     return json.dumps(obj)
 
-class QuestionTemplate:
-  def __init__(self):
-    self.logger = LoggerFactory(self).getLogger()
-    self.counting = Sentence(0,"How many object does someone verb")
+# class QuestionTemplate:
+#   def __init__(self):
+#     self.logger = LoggerFactory(self).getLogger()
+#     self.counting = Sentence(0,"How many object does someone verb")
 
 class Sentence:
   # Tense
@@ -196,11 +196,17 @@ class Sentence:
     verbs = srl.parse(self.sentence)
     auxVerbs = srl.auxVerbs
     set_auxVerbs = set(auxVerbs)
-
+    self.logger.debug(f"SRL verb:{verbs}")
     obj = {"isExist": False, "index":None}
     self.do = obj.copy()
     self.have = obj.copy()
     self.verb = obj.copy()
+    if(len(verbs) == 1):
+      word = self.getWord(verbs[0])
+      self.verb["isExist"] = True
+      self.verb["index"] = word.index
+      self.logger.debug(f"Found real_verb:{self.verb} | word:{word}")
+      return None
 
     set_do = WordSem.SET_DO
     set_have = WordSem.SET_HAVE
@@ -339,5 +345,5 @@ class Word:
     obj["SRL"] = {'tag':self.SRLtag, 'suffix':self.SRLSuffix, 'role':self.SRLRole}
     return json.dumps(obj)
 
-qt = QuestionTemplate()
-print(qt.counting)
+# qt = QuestionTemplate()
+# print(qt.counting)

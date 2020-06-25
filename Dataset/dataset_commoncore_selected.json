@@ -1,5 +1,27 @@
 [
   {
+    "No.": "Test",
+    "Question": "How many eggs are there in the basket? How many eggs are in the basket? How many apples does Sam eat? How many apples does Sam have left? How many apples are in Sam's stomach? How many apples are eaten by Sam?",
+    "Type": "Add to",
+    "Equation": "2 + 3",
+    "Answer": "5"
+  },
+  {
+    "No.": "Test",
+    "Question": "Sam eats 2 apples. 2 apples are eaten by Sam.",
+    "Type": "Add to",
+    "Equation": "2 + 3",
+    "Answer": "5"
+  },
+
+  {
+    "No.": "Test",
+    "Question": "There are 3 small eggs in the basket. 3 small eggs are in the basket. The basket has 3 small eggs. The basket has 3 small eggs in it. Sam is handsome.",
+    "Type": "Add to",
+    "Equation": "2 + 3",
+    "Answer": "5"
+  },
+  {
     "No.": "3.5",
     "Question": "2 bunnies sat on the grass. 3 more bunnies hopped there. How many bunnies are on the grass now?",
     "Type": "Add to",
@@ -62,7 +84,6 @@
     "Equation": "2 + 3",
     "Answer": "5"
   },
-
   {
     "No.": "3.14",
     "Question": "There are 2 apples on the table. Sam put 3 more apples on the table. How many apples are there?",
