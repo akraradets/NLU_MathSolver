@@ -152,6 +152,8 @@ class Main:
       #   elif(actionClass == WordSem.DEDUCTIVE):
       #     equation.minus(state_entity['quantity'])
 
+    else:
+      raise f"The question does not set 'ProblemType'"
     return equation
 
   def compareObj(self,o1,o2,partial=False):

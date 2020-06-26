@@ -95,6 +95,22 @@ class Sentence:
       1 : 'QUERY'
     }
 
+  STRUCTURE_THERE = 0
+  STRUCTURE_ARG1_PREP = 1
+  STRUCTURE_ARG0_VERB_ARG1 = 2
+
+  LIST_STA_STRUCTURE = {
+    0 : 'There {be} (ARG1) (PP)',
+    1 : '(ARG1) {verb} {prep} (ARG2)',
+    2 : '(ARG0) {verb} (ARG1)'
+  }
+
+  LIST_QUE_STRUCTURE = {
+    0 : 'How many (ARG1) {be} there (PP)',
+    1 : 'How many (ARG1) {be} {prep} (ARG2)',
+    2 : 'How many (ARG1) {do} (ARG0) {verb}'
+  }
+
   def __init__(self,index,sentence):
     self.logger = LoggerFactory(self).getLogger()
     if(sentence == ""): raise ValueError(f"Sentence is an empty string")
@@ -103,6 +119,7 @@ class Sentence:
     self.sentence = sentence
     self.type = Sentence.TYPE_STATEMENT
     self.tense = Sentence.TENSE_OTHERS
+    self.structure = None
     self.verb = None
     self.ARG0 = []
     self.ARG1 = []
@@ -117,6 +134,7 @@ class Sentence:
     self.__checkTense()
     self.__parseSRL()
     self.__setSRLArgument()
+    self.__setStructure()
 
   def getArg(self,num):
     validNum = set({0,1,2,3,4})
@@ -125,11 +143,19 @@ class Sentence:
     arg = [w for w in self.words if(w.SRLRole == target)]
     return arg
 
+  def getStructureName(self,enum,type):
+    if(type == Sentence.TYPE_STATEMENT):
+      return Sentence.LIST_STA_STRUCTURE.get(enum, "Invalid number")
+    elif(type == Sentence.TYPE_QUERY):
+      return Sentence.LIST_QUE_STRUCTURE.get(enum, "Invalid number")
+    else:
+      raise ValueError(f"Invalid type={type}")
+
   def getTenseName(self,enum):
-    return Sentence.LIST_TENSE.get(enum, "Invalid numbner")
+    return Sentence.LIST_TENSE.get(enum, "Invalid number")
 
   def getTypeName(self,enum):
-    return Sentence.LIST_TYPE.get(enum, "Invalid numbner")
+    return Sentence.LIST_TYPE.get(enum, "Invalid number")
 
   def getVerb(self):
     if(self.verb is None): raise ValueError(f"__extractVerb first")
@@ -147,6 +173,9 @@ class Sentence:
     if(self.words is None): raise ValueError(f"__parsePOS first")
     if(index != None): return self.words[index]
     raise ValueError(f"I don't know why. index={index}. word={self.words[index]}")
+
+  def __setStructure(self):
+    raise Exception(f"not yet implement")
 
   def __parsePOS(self):
     """ Con Parse: We get parseTree, POS, words """
@@ -296,6 +325,7 @@ class Sentence:
     obj = {}
     obj["index"] = self.index
     obj["sentence"] = self.sentence
+    obj["structure"] = self.getStructureName(self.structure,self.type)
     obj["type"] = self.getTypeName(self.type)
     obj["verb"] = self.verb
     obj["tense"] = self.getTenseName(self.tense)
