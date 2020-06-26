@@ -7,9 +7,15 @@ from nltk.stem import WordNetLemmatizer
 import json
 
 class Question:
-  CLASS_COUNTING = 0
-  LIST_CLASS = {
-    0 : "COUNTING"
+  TYPE_AddTo_ResultUnknow = 0
+  TYPE_TakeFrom_ResultUnknow = 1
+  TYPE_PutTogetherTakeApart_TotalUnknow = 2
+  TYPE_Compare_BiggerUnknow = 3
+  LIST_TYPE = {
+    0 : "Add to - Result Unknown",
+    1 : "Take from - Result Unknown",
+    2 : "Put Together/Take Apart - Total Unknown",
+    3 : "Compare - Bigger Unknown",
   }
 
   def __init__(self, question):
@@ -18,10 +24,14 @@ class Question:
 
     self.question = question
     self.sentences = []
-    self.problemClass = None
+    self.problemType = None
     self.__construct__()
-    # self.__defineProblemClass()
+    # self.__defineProblemType()
     self.logger.debug(f"question:{self}")
+
+  @staticmethod
+  def getProblemTypeName(enum):
+    return Question.LIST_TYPE.get(enum, "Invalid numbner")
 
   def getQuerySentence(self):
     querySentences = [sent for index, sent in enumerate(self.sentences) if sent.type == Sentence.TYPE_QUERY]
@@ -40,7 +50,7 @@ class Question:
       s = Sentence(index,sent)
       self.sentences.append( s )
 
-  def __defineProblemClass(self):
+  def __defineProblemType(self):
     # get query sentence
     querySentence = self.getQuerySentence()
     # detecting sentence structure.
@@ -52,14 +62,14 @@ class Question:
 
     verb = querySentence.getVerb()
     ms = MSCorpus.getInstance()
-    self.problemClass = ms.getWordSem(verb.lemma)
+    self.problemType = ms.getWordSem(verb.lemma)
 
   def __repr__(self):
     return self.__str__()
 
   def __str__(self):
     obj = {}
-    obj["problemClass"] = WordSem.getName(self.problemClass)
+    obj["problemType"] = Question.getProblemTypeName(self.problemType)
     obj["question"] = self.question
     obj["sentencens"] = [json.loads(s.__str__()) for s in self.sentences]
     return json.dumps(obj)
