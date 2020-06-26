@@ -88,6 +88,11 @@ class Question:
         # There is no word 'fewer'
         pass
 
+    # TODO: Check how many enities in each sentence \\(  >w<)// \(>___< .)// 
+    # detect entity
+    for sent in self.sentences:
+      sent.entity = [w for w in sent.getArg(1) if ( w.name.lower() not in set({'how','many'}) ) ]
+
     # # get query sentence
     # querySentence = self.getQuerySentence()
     # # detecting sentence structure.

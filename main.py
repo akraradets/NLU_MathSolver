@@ -11,6 +11,7 @@ from MSCorpus import MSCorpus, WordSem
 from Solver import PossessiveSolver
 from Question import Question
 from Equation import Equation
+from Entity import Entity
 import json
 
 class Main:
