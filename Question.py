@@ -3,7 +3,8 @@ from nltk.tokenize import sent_tokenize
 from MSParser import ConParser,SRLParser
 from MSCorpus import MSCorpus, WordSem
 # from nltk.stem.wordnet import WordNetLemmatizer
-from nltk.stem import WordNetLemmatizer 
+from nltk.stem import WordNetLemmatizer
+from Entity import Entity
 import json
 
 class Question:
