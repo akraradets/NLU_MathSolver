@@ -26,7 +26,7 @@ class Question:
     self.sentences = []
     self.problemType = None
     self.__construct__()
-    # self.__defineProblemType()
+    self.__defineProblemType()
     self.logger.debug(f"question:{self}")
 
   @staticmethod
@@ -51,18 +51,55 @@ class Question:
       self.sentences.append( s )
 
   def __defineProblemType(self):
-    # get query sentence
-    querySentence = self.getQuerySentence()
-    # detecting sentence structure.
-    # Class 1: counting
-    # Structure: How many [object] {do} [someone] {verb - possession} [optional]
-    # Solution: These type of problem class ask us to count the number of object that someone acting on it. 
-    #           the counting must accounting for interchangeble verb list consume - eat and colour - paint.
+    """ Check if any of the sentences has comparison phrase """
+    for sent in self.sentences:
+      # compare phrase are more ... than, less ... than, and fewer ... than
+      # more, less, fewer and followed by than
+      try:
+        than = sent.getWord('than')
+      except:
+        # There is no word 'than'
+        continue
+      
+      try:
+        more = sent.getWord('more')
+        if(more.index < than.index):
+          self.problemType = Question.TYPE_Compare_BiggerUnknow
+          return        
+      except:
+        # There is no word 'more'
+        pass
+
+      try:
+        less = sent.getWord('less')
+        if(less.index < than.index):
+          self.problemType = Question.TYPE_Compare_BiggerUnknow
+          return     
+      except:
+        # There is no word 'less'
+        pass
+
+      try:
+        fewer = sent.getWord('fewer')
+        if(fewer.index < than.index):
+          self.problemType = Question.TYPE_Compare_BiggerUnknow
+          return
+      except:
+        # There is no word 'fewer'
+        pass
+
+    # # get query sentence
+    # querySentence = self.getQuerySentence()
+    # # detecting sentence structure.
+    # # Class 1: counting
+    # # Structure: How many [object] {do} [someone] {verb - possession} [optional]
+    # # Solution: These type of problem class ask us to count the number of object that someone acting on it. 
+    # #           the counting must accounting for interchangeble verb list consume - eat and colour - paint.
 
 
-    verb = querySentence.getVerb()
-    ms = MSCorpus.getInstance()
-    self.problemType = ms.getWordSem(verb.lemma)
+    # verb = querySentence.getVerb()
+    # ms = MSCorpus.getInstance()
+    # self.problemType = ms.getWordSem(verb.lemma)
 
   def __repr__(self):
     return self.__str__()
@@ -95,9 +132,13 @@ class Sentence:
       1 : 'QUERY'
     }
 
-  STRUCTURE_THERE = 0
-  STRUCTURE_ARG1_PREP = 1
-  STRUCTURE_ARG0_VERB_ARG1 = 2
+  STRUCTURE_STA_THERE = 0
+  STRUCTURE_STA_ARG1_PREP = 1
+  STRUCTURE_STA_ARG0_VERB_ARG1 = 2
+
+  STRUCTURE_QUE_THERE = 0
+  STRUCTURE_QUE_ARG1_PREP = 1
+  STRUCTURE_QUE_ARG0_VERB_ARG1 = 2
 
   LIST_STA_STRUCTURE = {
     0 : 'There {be} (ARG1) (PP)',
@@ -175,7 +216,26 @@ class Sentence:
     raise ValueError(f"I don't know why. index={index}. word={self.words[index]}")
 
   def __setStructure(self):
-    raise Exception(f"not yet implement")
+    if(self.type == Sentence.TYPE_STATEMENT):
+      # First word is 'There'
+      firstWord = self.words[0]
+      if(firstWord.lemma.lower() == 'there'):
+        self.structure = Sentence.STRUCTURE_STA_THERE
+      # First word is ARG1
+      elif(firstWord.SRLRole == 'ARG1'):
+        self.structure = Sentence.STRUCTURE_STA_ARG1_PREP
+      # First word is ARG0
+      elif(firstWord.SRLRole == 'ARG0'):
+        self.structure = Sentence.STRUCTURE_STA_ARG0_VERB_ARG1
+      else:
+        raise ValueError(f"Non of the condition is met.")
+
+    # elif(self.type  == Sentence.TYPE_QUERY):
+    #   raise Exception(f"not yet implement")
+    # else:
+    #   raise Exception(f"type={self.type} is not yet implement")
+    
+    self.logger.debug(self.getStructureName(self.structure,self.type))
 
   def __parsePOS(self):
     """ Con Parse: We get parseTree, POS, words """

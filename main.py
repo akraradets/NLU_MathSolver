@@ -36,14 +36,20 @@ class Main:
     for data in dataset:
       print(f"================ Question-{data['No.']} ================")
       question = Question(data['Question'])
-      equation = self.solve(question)
-      self.logger.debug(f"Equation:{equation.prettify()}|Dump:{equation}")
-      answer = equation.evalute()
-      if(answer != data['Answer']):
-        self.logger.info(f"{data['No.']} is ***incorrect***.|Answer:{answer}|Correct:{data['Answer']}")
+      problemTypeName = Question.getProblemTypeName(question.problemType)
+      if(problemTypeName != data["Type"]):
+        self.logger.info(f"{data['No.']} is ***incorrect***.|Type:{problemTypeName}|Correct:{data['Type']}")  
         break
       else:
-        self.logger.info(f"{data['No.']} is correct|Answer:{answer}|Correct:{data['Answer']}")
+          self.logger.info(f"{data['No.']} is correct|Type:{problemTypeName}|Correct:{data['Type']}")
+      # equation = self.solve(question)
+      # self.logger.debug(f"Equation:{equation.prettify()}|Dump:{equation}")
+      # answer = equation.evalute()
+      # if(answer != data['Answer']):
+      #   self.logger.info(f"{data['No.']} is ***incorrect***.|Answer:{answer}|Correct:{data['Answer']}")
+      #   break
+      # else:
+      #   self.logger.info(f"{data['No.']} is correct|Answer:{answer}|Correct:{data['Answer']}")
     # 1. Constract & Break question into sentence and word
     # question = Question(self.loadQuestion())
     # self.solve(question)
