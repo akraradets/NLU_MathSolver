@@ -29,7 +29,40 @@ class Entity:
     1 : 'FEMALE'
   }
 
-  def __init__(self,wordArray):
+  MATCH_NO = -1
+  MATCH_PARTIALLY = 1
+  MATCH_FULLY = 2
+  LIST_MATCH = {
+   -1 : "NO",
+    1 : "PARTIALLY",
+    2 : "FULLY"
+  }
+
+  @staticmethod
+  def match(e1,e2):
+    matchFully = Entity.compare(e1,e2,False)
+    matchPartially = Entity.compare(e1,e2,True)
+    if(matchFully):
+      return Entity.MATCH_FULLY
+    if(matchPartially):
+      return Entity.MATCH_PARTIALLY
+    return Entity.MATCH_NO
+
+  @staticmethod
+  def compare(e1,e2,partial=False):
+    c1 = e1.name == e2.name
+    c2 = None
+    if(partial):
+      c2 = e1.adjective.isdisjoint(e2.adjective)
+    else:
+      c2 = e1.adjective == e2.adjective
+    return c1 and c2
+
+  @staticmethod
+  def getMatchName(enum):
+    return Entity.LIST_MATCH.get(enum, "Invalid numbner")
+
+  def __init__(self,wordArray = []):
     self.logger = LoggerFactory(self).getLogger()
 
     self.quantity = None

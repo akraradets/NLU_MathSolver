@@ -89,10 +89,37 @@ class Question:
         # There is no word 'fewer'
         pass
 
-    # TODO: Check how many enities in each sentence \\(  >w<)// \(>___< .)// 
-    # detect entity
+    # DONE: Extract entity in each sentence \\(  >w<)// \(>___< .)// 
     for sent in self.sentences:
-      sent.entity = [w for w in sent.getArg(1) if ( w.name.lower() not in set({'how','many'}) ) ]
+      actor = sent.getArg(0)
+      entity = [w for w in sent.getArg(1) if ( w.name.lower() not in set({'how','many'}) ) ]
+      sent.entity = Entity(entity)
+      sent.actor = Entity(actor)
+
+    query = self.getQuerySentence()
+    # macthing entity
+    query_entity = query.entity
+    state_entities = [state.entity for state in self.getStatementSentences()]
+    entity_matches = []
+    for state_entity in state_entities:
+      entity_matches.append(Entity.match(query_entity,state_entity))
+    self.logger.debug(f"Entity Matches:{[Entity.getMatchName(r) for r in entity_matches]}")
+
+    # matching actor
+    query_actor = query.actor
+    state_actors = [state.actor for state in self.getStatementSentences()]
+    actor_mathces = []
+    for state_actor in state_actors:
+      actor_mathces.append(Entity.match(query_actor,state_actor))
+    self.logger.debug(f"Actor Matches:{[Entity.getMatchName(r) for r in actor_mathces]}")
+
+    if(Entity.MATCH_PARTIALLY in entity_matches):
+      self.problemType = Question.TYPE_PutTogetherTakeApart_TotalUnknow
+    if(Entity.MATCH_NO in actor_mathces):
+      self.problemType = Question.TYPE_PutTogetherTakeApart_TotalUnknow
+    
+    if(self.problemType == None):
+      self.problemType = Question.TYPE_AddTo_ResultUnknow
 
     # # get query sentence
     # querySentence = self.getQuerySentence()
@@ -173,6 +200,8 @@ class Sentence:
     self.ARG2 = []
     self.ARG3 = []
     self.ARG4 = []
+    self.entity = Entity()
+    self.actor = Entity()
 
     self.__parsePOS()
     # With POS, we can determine if the sentence is a query
@@ -300,6 +329,7 @@ class Sentence:
     srl = SRLParser.getInstance()
     verbs = srl.parse(self.sentence)
     auxVerbs = srl.auxVerbs
+    self.logger.debug(f"{verbs} {auxVerbs}")
     set_auxVerbs = set(auxVerbs)
     self.logger.debug(f"SRL verb:{verbs}")
     obj = {"isExist": False, "index":None}
@@ -400,6 +430,8 @@ class Sentence:
     obj["ARG2"] = self.ARG2
     obj["ARG3"] = self.ARG3
     obj["ARG4"] = self.ARG4
+    obj["entity"] = json.loads(self.entity.__str__())
+    obj["actor"] = json.loads(self.actor.__str__())
     obj["tree"] = self.tree_str
     obj["words"] = self.__getWordsAsArray()
     return json.dumps(obj)
