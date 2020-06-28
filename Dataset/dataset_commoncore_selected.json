@@ -1,5 +1,12 @@
 [
   {
+    "No.": "3.6",
+    "Question": "2 red apples are on the table. 3 green apples are on the table. How many apples are on the table?",
+    "Type": "Put Together/Take Apart",
+    "Equation": "2 + 3",
+    "Answer": "5"
+  },
+  {
     "No.": "3.7",
     "Question": "Julie has 3 more apples than Lucy. Lucy has 2 apples. How many apples does Julie have?",
     "Type": "Compare - Bigger Unknown",
